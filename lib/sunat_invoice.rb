@@ -1,4 +1,5 @@
 require 'savon'
+require 'gyoku'
 
 module Invoice
   class << self
@@ -35,6 +36,10 @@ module Invoice
 
     def prepare_zip
       # xml should be sended insided zip
+    end
+
+    def generate_xml hash
+      Gyoku.xml(hash)
     end
   end
 end

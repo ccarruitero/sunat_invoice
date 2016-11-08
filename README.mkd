@@ -1,2 +1,2 @@
-# E-Invoice
+# SUNAT-Invoice
 Ruby wrapper to use SUNAT Electronic Invoice API
