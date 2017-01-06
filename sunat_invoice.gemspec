@@ -10,8 +10,8 @@ Gem::Specification.new do |s|
 
   s.files = `git ls-files`.split("\n")
 
-  s.add_runtime_dependency "savon", "2.6.0"
+  s.add_runtime_dependency "savon", "2.11.1"
 
-  s.add_dependency "gyoku", "~> 1.2"
+  s.add_dependency "gyoku", "1.3.1"
   s.add_development_dependency "cutest"
 end

@@ -1,7 +1,7 @@
 require 'savon'
 require 'gyoku'
 
-module Invoice
+module SunatInvoice
   class << self
     attr_accessor :configuration
   end
