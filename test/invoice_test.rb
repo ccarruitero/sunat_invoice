@@ -40,4 +40,12 @@ scope "Invoice" do
     assert h.keys[0].to_s == "cbc:IssueDate"
     assert h.values[0] == today
   end
+
+  test "get field names from tags hash" do
+    array = []
+    hash = {date: DateTime.now, address: {street: 'Park Street', number: 124}}
+    @invoice.get_fields(array, hash)
+    assert array.first == "date"
+    assert array.last == "address_number"
+  end
 end

@@ -1,45 +1,27 @@
+require_relative 'ubl_tags'
+
 module SunatInvoice
   class Invoice
-    #  UBL  2.0 firma  electrónica XMLDSIG1
 
-    FIELDS = ['date', 'signature', 'registration_name']
     BASIC_FIELDS = []
-
-    TAGS_UBL = {
-      date: "cbc:IssueDate",
-      signature: {
-        digital_signature: "ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/ds:Signature id='#{@signature_id}'",
-        },
-      provider: {
-      },
-      registration_name: "cac:AccountingSupplierParty/cac:Party/cac:PartyLegalEntity/cbc:RegistrationName",
-      name: "cac:AccountingSupplierParty/cac:Party/cac:PartyName/cbc:Name",
-      address: {
-        ubigeo: "cac:AccountingSupplierParty/cac:Party/cac:PostalAddress/cbc:ID ",
-        street: "cac:AccountingSupplierParty/cac:Party/cac:PostalAddress/cbc:StreetName",
-        urbanizacion: "cac:AccountingSupplierParty/cac:Party/cac:PostalAddress/cbc:CitySubdivisionName",
-        provincia: "cac:AccountingSupplierParty/cac:Party/cac:PostalAddress/cbc:CityName",
-        departamento: "cac:AccountingSupplierParty/cac:Party/cac:PostalAddress/cbc:CountrySubentity",
-        district: "cac:AccountingSupplierParty/cac:Party/cac:PostalAddress/cbc:District",
-        country_code: "cac:AccountingSupplierParty/cac:Party/cac:PostalAddress/cac:Country/cbc:IdentificationCode ",
-      },
-      ruc: {
-        ruc_number: "cac:AccountingSupplierParty/cbc:CustomerAssignedAccountID",
-        document_type: "cac:AccountingSupplierParty/cbc:AdditionalAccountID",
-      },
-      document_type: "cbc:InvoiceTypeCode",
-      document_number: "cbc:ID",
-      customer: {
-        document_number: "cac:AccountingCustomerParty/cbc:CustomerAssignedAccountID",
-        document_type: "cac:AccountingCustomerParty/cbc:AdditionalAccountID",
-      },
-      customer_registration_name: "cac:AccountingCustomerParty/cac:Party/cac:PartyLegalEntity/cbc:RegistrationName",
-    }
 
     def initialize
       # @signature_path = config.signature_path
       # @signature_id = 
-      # FIELDS.each { |field| set_field_value(field) }
+      @fields = []
+      get_fields @fields, TAGS_UBL
+      # @fields.each { |field| set_field_value(field) }
+    end
+
+    def get_fields array, hash, prefix=nil
+      hash.each do |key, value|
+        key_s = key.to_s
+        if value.is_a? Hash
+          get_fields(array, value, key_s)
+        else
+          array << (prefix.nil? ? key_s : "#{prefix}_#{key_s}")
+        end
+      end
     end
 
     def set_field_value fields
@@ -83,7 +65,7 @@ module SunatInvoice
 
     def get_xml
       hash = {}
-      FIELDS.each { |field| get_hash_xml(hash, field) }
+      @fields.each { |field| get_hash_xml(hash, field) }
 
       gyoku_xml = Gyoku.xml(invoice: hash)
       Nokogiri.XML(gyoku_xml).to_xml
