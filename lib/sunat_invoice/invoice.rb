@@ -13,25 +13,26 @@ module SunatInvoice
       # @fields.each { |field| set_field_value(field) }
     end
 
-    def get_fields array, hash, prefix=nil
-      hash.each do |key, value|
+    def get_fields array, hash
+      hash_parse(hash) do |key, value, prefix|
         key_s = key.to_s
-        if value.is_a? Hash
-          get_fields(array, value, key_s)
-        else
-          array << (prefix.nil? ? key_s : "#{prefix}_#{key_s}")
-        end
+        array << (prefix.nil? ? key_s : "#{prefix}_#{key_s}")
       end
     end
 
-    def set_field_value fields
-      fields.each do |key, value|
-        if value.class == Hash
-          value.each do |k, v|
-            instance_variable_set("@#{key.to_s}_#{k.to_s}_value", v)
-          end
+    def set_field_value hash
+      hash_parse(hash) do |key, value, prefix|
+        field_str = prefix.nil? ? key.to_s : "#{prefix}_#{key.to_s}"
+        instance_variable_set("@#{field_str}_value", value)
+      end
+    end
+
+    def hash_parse hash, prefix=nil, &block
+      hash.each do |key, value|
+        if value.is_a? Hash
+          hash_parse value, key, &block
         else
-          instance_variable_set("@#{key.to_s}_value", value)
+          block.call(key, value, prefix)
         end
       end
     end
