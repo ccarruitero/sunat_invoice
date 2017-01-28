@@ -1,5 +1,10 @@
 module Utils
-  def ubl_ext hash
+  def concat_xml(parent_str, child_str, key)
+    i = parent_str.index("/#{key}>") + key.to_s.length + 1
+    parent_str.insert(i, child_str)
+  end
+
+  def ubl_ext(hash)
     {
       "ext:UBLExtensions" => {
         "ext:UBLExtension" => {
@@ -9,18 +14,23 @@ module Utils
     }
   end
 
-  def igv_tax
+  def igv_tax(igv_amount)
+    main_xml = Gyoku.xml(igv_amount, 1000, 'IGV', 'VAT')
+    child_xml = Gyoku.xml("cbc:TaxExemptionReasonCode" => '10') # ?
+    concat_xml(main_xml, child_xml, 'cac:TaxCategory')
+  end
+
+  def tax_scheme(amount, exemption_reason, id, name, tax_type)
     {
       "cac:TaxTotal" => {
-        "cbc:TaxAmount" => :igv_amount,
+        "cbc:TaxAmount" => amount,
         "cac:TaxSubtotal" => {
-          "cbc:TaxAmount" => :igv_amount,
+          "cbc:TaxAmount" => amount,
           "cac:TaxCategory" => {
-            "cbc:TaxExemptionReasonCode" => 10, # ?
             "cac:TaxScheme" => {
-              "cbc:ID" => 1000,
-              "cbc:Name" => "IGV",
-              "cbc:TaxTypeCode" => "VAT"
+              "cbc:ID" => id,
+              "cbc:Name" => name,
+              "cbc:TaxTypeCode" => tax_type_code
             },
           },
         },
@@ -28,43 +38,41 @@ module Utils
     }
   end
 
-  def isc_tax
+  def isc_tax(isc_amount)
+    main_xml = Gyoku.xml(tag_scheme(isc_amount, 2000, 'ISC', 'EXC'))
+    child_xml = Gyoku.xml({'cbc:TierRange' => '02' })
+    concat_xml(main_xml, child_xml, 'cac:TaxCategory')
+  end
+
+  def other_tax
     {
       "cac:TaxTotal" => {
-        "cbc:TaxAmount" => :isc_amount,
+        "cbc:TaxAmount" => :other_tax_amount,
         "cac:TaxSubtotal" => {
-          "cbc:TaxAmount" => :isc_amount,
+          "cbc:TaxAmount" => :other_tax_amount,
           "cac:TaxCategory" => {
-            "cbc:TierRange" => "02", # ?
             "cac:TaxScheme" => {
-              "cbc:ID" => 2000,
-              "cbc:Name" => "ISC",
-              "cbc:TaxTypeCode" => "EXC"
+              "cbc:ID" => 9999,
+              "cbc:Name" => "OTROS",
+              "cbc:TaxTypeCode" => "OTH"
             },
           },
         },
-      },
+      }
     }
   end
 
-  def total_tax
-    {
-      "sac:AdditionalMonetaryTotal" => {
-        "cbc:ID" => 1001,
-        "cbc:PayableAmount" => :total_valor_venta_gravadas
-      },
-      "sac:AdditionalMonetaryTotal" => {
-        "cbc:ID" => 1002,
-        "cbc:PayableAmount" => :total_Valor_venta_inafectas
-      },
-      "sac:AdditionalMonetaryTotal" => {
-        "cbc:ID" => 1003,
-        "cbc:PayableAmount" => :total_valor_venta_exoneradas
-      },
-      "sac:AdditionalMonetaryTotal" => {
-        "cbc:ID" => 1004,
-        "cbc:PayableAmount" => :total_valor_venta_gratuitas
-      },
-    }
+  def total_tax(venta_gravada, venta_inafecta, venta_exonerada, venta_gratuita)
+    payable_xml(venta_gravada, 1001) + payable_xml(venta_inafecta, 1002) +
+    payable_xml(venta_exonerada, 1003) + payable_xml(venta_gratuita, 1004)
+  end
+
+  private
+
+  def payable_xml(amount, code)
+    Gyoku.xml("sac:AdditionalMonetaryTotal" => {
+      "cbc:ID" => code,
+      "cbc:PayableAmount" => amount
+    })
   end
 end

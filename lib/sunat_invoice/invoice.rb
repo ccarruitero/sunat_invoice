@@ -31,7 +31,7 @@ module SunatInvoice
       end
     end
 
-    def hash_parse(hash, prefix=nil, &block)
+    def hash_parse(hash, prefix = nil, &block)
       hash.each do |key, value|
         if value.is_a? Hash
           hash_parse value, key, &block
@@ -44,8 +44,8 @@ module SunatInvoice
     def get_field_value(field)
       return unless field.class == Array
       if field.length > 1
-        composed_field = ""
-        field.each {|f| composed_field += "_#{f.to_s}" }
+        composed_field = ''
+        field.each {|f| composed_field += "_#{f}" }
         composed_field = composed_field.sub("_", "")
         instance_variable_get("@#{composed_field}_value")
       else
@@ -65,23 +65,26 @@ module SunatInvoice
     def get_hash_xml(hash, field)
       tag = get_tag(field)
       tag_value = get_field_value(field)
-      hash.merge!(:"#{tag}"=> tag_value)
+      hash.merge!("#{tag}": tag_value)
     end
 
-    def get_xml
+    def xml
       #hash = {}
       #@fields.each { |field| get_hash_xml(hash, field) }
 
-      gyoku_xml = Gyoku.xml(invoice: xml_hash)
+      main_xml = Gyoku.xml(invoice: xml_hash)
+      concat_xml(main_xml, ubl_ext('sac:AdditionalInformation' => {
+                                    # TODO: total taxs
+                                   }),'cac:InvoiceLine')
       Nokogiri.XML(gyoku_xml).to_xml
     end
 
     def xml_hash
       {
-        "cbc:IssueDate" => :date,
+        'cbc:IssueDate' => :date,
         # digital sign
-        "cac:Signature" => {
-          "cbc:ID" => "",
+        'cac:Signature' => {
+          'cbc:ID' => @provider.signature,
           "cac:SignatoryParty" => {
             "cac:PartyIdentification" => {
               "cbc:ID" => @provider.ruc
@@ -130,76 +133,7 @@ module SunatInvoice
             }
           }
         },
-        "cbc:InvoicedQuantity" => :quantity,
-        # UN/ECE rec 20- Unit Of Measure
-        # http://www.unece.org/fileadmin/DAM/cefact/recommendations/rec20/rec20_rev3_Annex2e.pdf
         "cac:InvoiceLine" => {
-          # each child require an InvoiceLine
-          "cac:Item" => {
-            "cbc:Description" => :description,
-          },
-          "cac:Price" => {
-            "cbc:PriceAmount" => :price # valor unitario
-          },
-          "cac:PricingReference" => {
-            "cac:AlternativeConditionPrice" => {
-              "cbc:PriceAmount" => :price, # precio venta
-              "cbc:PriceTypeCode" => :price_code
-            }
-          },
-          # taxs
-        },
-        "ext:UBLExtensions" => {
-          "ext:UBLExtension" => {
-            "ext:ExtensionContent" => {
-              "sac:AdditionalInformation" => {
-                # total tax
-              }
-            }
-          }
-        },
-        # x item
-        "cac:InvoiceLine" => {
-          "cbc:LineExtensionAmount" => :valor_venta
-        },
-        "cac:TaxTotal" => {
-          "cbc:TaxAmount" => :total_igv_amount,
-          "cac:TaxSubtotal" => {
-            "cbc:TaxAmount" => :total_igv_amount,
-            "cac:TaxCategory" => {
-              "cac:TaxScheme" => {
-                "cbc:ID" => 1000,
-                "cbc:Name" => "IGV",
-                "cbc:TaxTypeCode" => "VAT"
-              },
-            },
-          },
-        },
-        "cac:TaxTotal" => {
-          "cbc:TaxAmount" => :total_isc_amount,
-          "cac:TaxSubtotal" => {
-            "cbc:TaxAmount" => :total_isc_amount,
-            "cac:TaxCategory" => {
-              "cac:TaxScheme" => {
-                "cbc:ID" => 2000,
-                "cbc:Name" => "ISC",
-                "cbc:TaxTypeCode" => "EXC"
-              },
-            },
-          },
-        },
-        "cac:TaxTotal" => {
-          "cbc:TaxAmount" => :total_other_tax_amount,
-          "cac:TaxSubtotal" => {
-            "cbc:TaxAmount" => :total_other_tax_amount,
-            "cac:TaxCategory" => {
-              "cac:TaxScheme" => {
-                "cbc:ID" => 9999,
-                "cbc:Name" => "OTROS",
-                "cbc:TaxTypeCode" => "OTH"
-              },
-            },
-          },
         },
         "cac:LegalMonetaryTotal" => {
           "cbc:ChargeTotalAmount" => :total_amount
