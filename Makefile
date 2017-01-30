@@ -5,3 +5,4 @@ console:
 
 test:
 	cutest test/*.rb
+	rubocop

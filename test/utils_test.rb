@@ -6,9 +6,7 @@ scope do
   test 'concat_xml can insert xml inside other xml' do
     hash = ubl_ext(nana: 'nasf')
     inner_xml = Gyoku.xml(hash)
-    other_hash = {'Invoice' => {
-                    'name': 'soemname',
-                 }}
+    other_hash = { 'Invoice' => { name: 'soemname' } }
     parent_xml = Gyoku.xml(other_hash)
     final_xml = concat_xml(parent_xml, inner_xml, 'name')
     assert final_xml.include?('ext:UBLExtensions')
