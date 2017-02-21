@@ -1,2 +1,22 @@
 # SUNAT-Invoice
 Ruby wrapper to use SUNAT Electronic Invoice API
+
+http://orientacion.sunat.gob.pe/index.php?option=com_content&view=article&id=1876:concepto-y-caracteristicas&catid=259:factura-electronica-desde-sistemas-contribuyente&Itemid=468
+
+https://s3.amazonaws.com/insc/ComprobantesDePago+Electronicos/eFacturas+d+sistemas+contrib/Act23dic2014/Manual+de+autorizacion.pdf
+
+https://github.com/leanucci/bravo#readme
+
+# check adiminstrate thoughbot
+
+
+# xml -> zip
+## Where are xml format??
+# facturas
+#http://orientacion.sunat.gob.pe/index.php?option=com_content&view=article&id=1898:guias-y-manuales&catid=259:factura-electronica-desde-sistemas-contribuyente&Itemid=468
+# boletas
+# http://orientacion.sunat.gob.pe/index.php?option=com_content&view=article&id=2086:guias-y-manuales&catid=310:boleta-de-venta-electronica&Itemid=522
+# <? xml version="1.0" encoding="ISO-8859-1" standalone="no" ?>
+# prod -> https:// www.sunat.gob.pe/ol-ti-itcpfegem/billService
+# dev -> https://www.sunat.gob.pe/ol-ti-itcpgem-sqa/billService
+# consulta CDR prod -> https://www.sunat.gob.pe/ol-it-wsconscpegem/billConsultService

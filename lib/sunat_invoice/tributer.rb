@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module SunatInvoice
   class Tributer
     attr_accessor :ruc, :name, :document_type, :ubigeo, :street, :urbanizacion,

@@ -1,6 +1,32 @@
+# frozen_string_literal: false
 module Utils
-  def concat_xml(parent_str, child_str, key)
-    i = parent_str.index("/#{key}>") + key.to_s.length + 2
+  def regex_type(mode, key)
+    case mode
+
+    when 'after'
+      "/#{key}"
+    else
+      key
+    end
+  end
+
+  def _index(mode, key)
+    case mode
+
+    when 'after'
+      key.to_s.length + 2
+    when 'before'
+      - 1
+    when 'inside'
+      key.to_s.length + 1
+    end
+  end
+
+  def concat_xml(parent_str, child_str, key, type = nil)
+    return unless parent_str.is_a?(String) && child_str.is_a?(String)
+    mode = type || 'after'
+    i = parent_str.index(regex_type(mode, key)) + _index(mode, key)
+
     parent_str.insert(i, child_str)
   end
 

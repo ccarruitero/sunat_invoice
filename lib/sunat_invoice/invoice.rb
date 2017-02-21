@@ -1,3 +1,4 @@
+# frozen_string_literal: false
 require_relative 'utils'
 require_relative 'provider'
 require_relative 'customer'
@@ -13,25 +14,45 @@ module SunatInvoice
       # @signature_id =
       @provider = provider || SunatInvoice::Provider.new
       @customer = customer || SunatInvoice::Customer.new
-      @date = date
+      @date = date || DateTime.now.strftime('%Y-%m-%d')
     end
 
     def xml
-      main_xml = Gyoku.xml(invoice: xml_hash)
-      concat_xml(main_xml, ubl_ext('sac:AdditionalInformation' => {
-                                     # TODO: total taxs
-                                   }), 'cac:InvoiceLine')
-      Nokogiri.XML(gyoku_xml).to_xml
+      parent_xml = Gyoku.xml(invoice: xml_hash)
+      child_xml = Gyoku.xml(ubl_ext('sac:AdditionalInformation' => {
+                                      # TODO: total taxs
+                                    }))
+      concat_xml(parent_xml, child_xml, 'cac:InvoiceLine')
+      Nokogiri.XML(parent_xml).to_xml
     end
 
     def xml_hash
       main_xml.merge(@customer.scheme)
     end
 
+    def signate_info
+      {
+        'ds:CanonicalizationMethod/': {
+          '@Algorithm': 'http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments'
+        },
+        'ds:SignatureMethod/': {
+          '@Algorithm': 'http://www.w3.org/2000/09/xmldsig#dsa-sha1'
+        },
+        'ds:Reference': {
+          '@URI': '',
+          content!: @provider.signature_reference
+        }
+      }
+    end
+
+    def digital_signature
+      Gyoku.xml(ubl_ext(@providersignature_hash))
+    end
+
     def main_xml
       {
         'cbc:IssueDate' => @date,
-        # digital sign
+        # '': digital_signature
         'cac:Signature' => {
           'cbc:ID' => @provider.signature,
           'cac:SignatoryParty' => {
@@ -51,40 +72,8 @@ module SunatInvoice
       }
     end
 
-    def provider_address
-      {
-        'cbc:ID' => @provider.ubigeo,
-        'cbc:StreetName' => @provider.street,
-        'cbc:CitySubdivisionName' => @provider.urbanizacion,
-        'cbc:CityName' => @provider.provincia,
-        'cbc:CountrySubentity' => @provider.departamento,
-        'cbc:District' => @provider.district,
-        'cac:Country' => {
-          'cbc:IdentificationCode' => @provider.country_code
-        }
-      }
-    end
-
     def provider_xml
-      concat_xml(provider_info, provider_address, 'cac:PostalAddress')
-    end
-
-    def provider_info
-      {
-        'cac:AccountingSupplierParty' => {
-          'cbc:CustomerAssignedAccountID' => @provider.ruc,
-          'cbc:AdditionalAccountID' => @provider.document_type,
-          'cac:Party' => {
-            'cac:PartyName' => {
-              'cbc:Name' => @provider.name
-            },
-            'cac:PostalAddress' => {}
-          },
-          'cac:PartyLegalEntity' => {
-            'cbc:RegistrationName' => @provider.registration_name
-          }
-        }
-      }
+      concat_xml(@provider.info, @provider.address, 'cac:PostalAddress')
     end
 
     def description_xml

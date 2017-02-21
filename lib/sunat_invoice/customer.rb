@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require_relative 'tributer'
 
 module SunatInvoice
@@ -7,11 +8,11 @@ module SunatInvoice
         'cbc:InvoiceTypeCode' => :document_type,
         'cbc:ID' => :document_number,
         'cac:AccountingCustomerParty' => {
-          'cbc:CustomerAssignedAccountID' => @customer.ruc,
-          'cbc:AdditionalAccountID' => @customer.document_type,
+          'cbc:CustomerAssignedAccountID' => @ruc,
+          'cbc:AdditionalAccountID' => @document_type,
           'cac:Party' => {
             'cac:PartyLegalEntity' => {
-              'cbc:RegistrationName' => @customer.registration_name
+              'cbc:RegistrationName' => @registration_name
             }
           }
         },
