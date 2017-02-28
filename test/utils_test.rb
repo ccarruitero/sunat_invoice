@@ -50,7 +50,7 @@ end
 
 test 'can insert a xml before a tag' do
   main_xml = Nokogiri::XML(concat_xml(@parent, @child, 'dizzleipsum', 'before'))
-  assert main_xml.children.first(2).last.children.first.name == 'food'
+  assert main_xml.children.first.children.first(2).last.name == 'food'
 end
 
 test 'can insert a xml after a tag' do
