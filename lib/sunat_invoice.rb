@@ -29,15 +29,21 @@ module SunatInvoice
     end
 
     def prod_server
-      'https:// www.sunat.gob.pe/ol-ti-itcpfegem/billService'
+      'https://e-factura.sunat.gob.pe/ol-ti-itcpfegem/billService?wsdl'
     end
 
     def dev_server
-      'https://www.sunat.gob.pe/ol-ti-itcpgem-sqa/billService'
+      'https://e-beta.sunat.gob.pe/ol-ti-itcpfegem-beta/billService?wsdl'
     end
 
     def consult_server
-      'https://www.sunat.gob.pe/ol-it-wsconscpegem/billConsultService'
+      # consult CDR and sended state
+      'https://www.sunat.gob.pe/ol-it-wsconscpegem/billConsultService?wsdl'
+    end
+
+    def valid_server
+      # verify and validate invoice
+      'https://www.sunat.gob.pe/ol-it-wsconsvalidcpe/billValidService?wsdl'
     end
 
     def prepare_zip(invoice)
