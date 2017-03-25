@@ -2,32 +2,128 @@
 require_relative 'helper'
 include SunatInvoice
 
-scope 'Invoice' do
-  setup do
-    @invoice = SunatInvoice::Invoice.new
-  end
+setup do
+  @provider = SunatInvoice::Provider.new(
+    signature: FFaker::LoremCN.paragraph,
+    ruc: FFaker::IdentificationMX.curp,
+    registration_name: FFaker::Company.name,
+    name: FFaker::Company.name,
+    document_type: 6,
+    ubigeo: '14',
+    street: '',
+    urbanizacion: '',
+    provincia: '',
+    departamento: '',
+    district: '',
+    country_code: ''
+  )
+  customer = SunatInvoice::Customer.new(
+    ruc: FFaker::IdentificationMX.curp,
+    registration_name: FFaker::Company.name,
+    document_type: 6
+  )
+  @invoice = SunatInvoice::Invoice.new(@provider, customer)
+  @parsed_xml = Nokogiri::XML(@invoice.xml) { |config| config.noblanks }
+end
 
-  # teardown do
-  #   @invoice = nil
-  # end
+test 'is not broken' do
+  assert !@invoice.nil?
+end
 
-  test 'is not broken' do
-    assert !@invoice.nil?
-  end
+test 'has namespaces' do
+  cbc = 'urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2'
+  namespaces = @parsed_xml.css('Invoice').first.namespaces
+  assert namespaces['xmlns:cbc'] == cbc
+end
 
-  test 'has at least basic info' do
-  end
+test 'xml start with invoice tag' do
+  assert @parsed_xml.root.name == 'Invoice'
+end
 
-  test 'xml start with invoice tag' do
-    parsed_xml = Nokogiri::XML(@invoice.xml)
-    invoice = parsed_xml.children.first
+test 'has a date' do
+  date = @parsed_xml.xpath('//cbc:IssueDate')
+  assert date.first.content == DateTime.now.strftime('%Y-%m-%d')
+end
 
-    # TODO: clean line jump
-    assert invoice.name == 'invoice'
+test 'has a signature' do
+  # /ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/ds:Signature
+  signature = @parsed_xml.xpath('//ext:UBLExtensions/ext:UBLExtension')
+  assert signature.xpath('//ext:ExtensionContent/ds:Signature').count == 1
 
-    date = invoice.children.first(2).last
-    assert date.name == 'cbc:IssueDate'
-    assert date.children.first.content == DateTime.now.strftime('%Y-%m-%d')
-    # signature_path
-  end
+  # /cac:Signature
+  signature = @parsed_xml.xpath('//cac:Signature')
+  assert signature.count == 1
+end
+
+test 'has a registration name' do
+  provider = @parsed_xml.xpath('//cac:AccountingSupplierParty/cac:Party')
+  name = provider.xpath('//cac:PartyLegalEntity/cbc:RegistrationName')
+  assert name.first.content == @provider.registration_name
+end
+
+test 'has a name' do
+  provider = @parsed_xml.xpath('//cac:AccountingSupplierParty/cac:Party')
+  name = provider.xpath('//cac:PartyName/cbc:Name')
+  assert name.first.content == @provider.name
+end
+
+test 'has an address' do
+  provider = @parsed_xml.xpath('//cac:AccountingSupplierParty/cac:Party')
+  ubigeo = provider.xpath('//cac:PostalAddress/cbc:ID')
+  assert ubigeo.first.content == @provider.ubigeo
+
+  street = provider.xpath('//cac:PostalAddress/cbc:StreetName')
+  assert street.first.content == @provider.street
+
+  urbanizacion = provider.xpath('//cac:PostalAddress/cbc:CitySubdivisionName')
+  assert urbanizacion.first.content == @provider.urbanizacion
+
+  provincia = provider.xpath('//cac:PostalAddress/cbc:CityName')
+  assert provincia.first.content == @provider.provincia
+
+  # Departamento
+  departamento = provider.xpath('//cac:PostalAddress/cbc:CountrySubentity')
+  assert departamento.first.content == @provider.departamento
+
+  # Distrito
+  distrito = provider.xpath('//cac:PostalAddress/cbc:District')
+  assert distrito.first.content == @provider.district
+
+  country_code_path = '//cac:PostalAddress/cac:Country/cbc:IdentificationCode'
+  country_code = provider.xpath(country_code_path)
+  assert country_code.first.content == @provider.country_code.to_s
+end
+
+test 'has a ruc' do
+  provider = @parsed_xml.xpath('//cac:AccountingSupplierParty')
+  ruc = provider.xpath('//cbc:CustomerAssignedAccountID')
+  assert ruc.first.content == @provider.ruc
+
+  document_type = provider.xpath('//cbc:AdditionalAccountID')
+  assert document_type.first.content == @provider.document_type.to_s
+end
+
+test 'has an invoice type' do
+  invoice_type = @parsed_xml.xpath('//cbc:InvoiceTypeCode')
+  assert invoice_type.first.content == @invoice.document_type
+end
+
+test 'has a correlative' do
+  tags = @parsed_xml.xpath('//cbc:ID')
+  correlative = tags.first
+  assert correlative.parent.name == 'Invoice'
+  assert correlative.content == @invoice.document_number
+end
+
+test 'has a customer' do
+  customer = @parsed_xml.xpath('//cac:AccountingCustomerParty')
+  assert customer.count == 1
+end
+
+test 'has at least one item' do
+  item = @parsed_xml.xpath('//cac:InvoiceLine')
+  assert item.count.positive?
+end
+
+test 'has taxs' do
 end

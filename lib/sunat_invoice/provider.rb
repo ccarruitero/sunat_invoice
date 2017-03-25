@@ -39,8 +39,23 @@ module SunatInvoice
       }
     end
 
+    def signate_info
+      {
+        'ds:CanonicalizationMethod/': {
+          '@Algorithm': 'http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments'
+        },
+        'ds:SignatureMethod/': {
+          '@Algorithm': 'http://www.w3.org/2000/09/xmldsig#dsa-sha1'
+        },
+        'ds:Reference': {
+          '@URI': '',
+          content!: signature_reference
+        }
+      }
+    end
+
     def xml
-      concat_xml(Gyoku.xml(info), Gyoku.xml(address), 'cac:PostalAddress')
+      Gyoku.xml(info)
     end
 
     def signature_reference
@@ -66,7 +81,7 @@ module SunatInvoice
             'cac:PartyName' => {
               'cbc:Name' => @name
             },
-            'cac:PostalAddress' => {},
+            'cac:PostalAddress' => address,
             'cac:PartyLegalEntity' => {
               'cbc:RegistrationName' => @registration_name
             }

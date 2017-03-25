@@ -7,26 +7,40 @@ module SunatInvoice
   class Invoice
     include Utils
 
-    @namespace_path = 'urn:oasis:names:specification:ubl:schema:xsd'
+    attr_accessor :document_type, :document_number
+
+    @namespace_path = 'urn:oasis:names:specification:ubl:schema:xsd:'
     UBL_NAMESPACES = {
-      'xmlns' => @namespace_path + ':Invoice-2',
-      'xmlns:cac' => @namespace_path + ':CommonAggregateComponents-2',
-      'xmlns:cbc' => @namespace_path + ':CommonBasicComponents-2'
+      'xmlns' => @namespace_path + 'Invoice-2',
+      'xmlns:cac' => @namespace_path + 'CommonAggregateComponents-2',
+      'xmlns:cbc' => @namespace_path + 'CommonBasicComponents-2',
+      'xmlns:ext' => @namespace_path + 'CommonExtensionComponents-2',
+      'xmlns:ds' => 'http://www.w3.org/2000/09/xmldsig#'
     }.freeze
 
-    def initialize(provider = nil, customer = nil, date = nil)
-      # @signature_path = config.signature_path
-      # @signature_id =
-      @provider = provider || SunatInvoice::Provider.new
-      @customer = customer || SunatInvoice::Customer.new
-      @date = date || DateTime.now.strftime('%Y-%m-%d')
+    def initialize(*args)
+      @provider = args[0] || SunatInvoice::Provider.new
+      @customer = args[1] || SunatInvoice::Customer.new
+      @date = args[2] || DateTime.now.strftime('%Y-%m-%d')
+      @document_type = args[3] || '01'
+      @document_number = args[4] || 'F001-1'
+    end
+
+    def invoice_info
+      {
+        'cbc:InvoiceTypeCode': @document_type,
+        'cbc:ID': @document_number
+      }
     end
 
     def xml
       parent_xml = Gyoku.xml(xml_hash)
-      child_xml = Gyoku.xml(ubl_ext('sac:AdditionalInformation' => {}))
-      concat_xml(parent_xml, child_xml, 'cac:InvoiceLine')
+      # child_xml = Gyoku.xml(ubl_ext('sac:AdditionalInformation' => {}))
+      info_xml = Gyoku.xml(invoice_info)
+      # concat_xml(parent_xml, child_xml, 'cac:InvoiceLine')
       concat_xml(parent_xml, @provider.xml, 'cac:Signature')
+      concat_xml(parent_xml, digital_signature, 'cbc:IssueDate')
+      concat_xml(parent_xml, info_xml, 'cbc:IssueDate')
 
       build = Nokogiri::XML::Builder.new do |xml|
         xml.Invoice(UBL_NAMESPACES) { xml << parent_xml }
@@ -36,21 +50,6 @@ module SunatInvoice
 
     def xml_hash
       main_xml.merge(@customer.scheme)
-    end
-
-    def signate_info
-      {
-        'ds:CanonicalizationMethod/': {
-          '@Algorithm': 'http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments'
-        },
-        'ds:SignatureMethod/': {
-          '@Algorithm': 'http://www.w3.org/2000/09/xmldsig#dsa-sha1'
-        },
-        'ds:Reference': {
-          '@URI': '',
-          content!: @provider.signature_reference
-        }
-      }
     end
 
     def digital_signature

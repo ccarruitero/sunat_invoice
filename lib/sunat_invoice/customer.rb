@@ -5,8 +5,6 @@ module SunatInvoice
   class Customer < Tributer
     def scheme
       {
-        'cbc:InvoiceTypeCode' => :document_type,
-        'cbc:ID' => :document_number,
         'cac:AccountingCustomerParty' => {
           'cbc:CustomerAssignedAccountID' => @ruc,
           'cbc:AdditionalAccountID' => @document_type,
@@ -16,7 +14,6 @@ module SunatInvoice
             }
           }
         },
-        'cac:InvoiceLine' => {},
         'cac:LegalMonetaryTotal' => {
           'cbc:ChargeTotalAmount' => :total_amount
         }
