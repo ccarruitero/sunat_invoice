@@ -7,6 +7,6 @@ scope 'SunatInvoice' do
     # gem is not broken
     client = SunatInvoice::Client.new
     api_server = client.instance_variable_get(:@bill_service_path)
-    assert api_server == 'https://www.sunat.gob.pe/ol-ti-itcpgem-sqa/billService'
+    assert api_server == 'https://e-beta.sunat.gob.pe/ol-ti-itcpfegem-beta/billService?wsdl'
   end
 end

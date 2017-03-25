@@ -7,7 +7,12 @@ module SunatInvoice
   class Invoice
     include Utils
 
-    BASIC_FIELDS = [].freeze
+    @namespace_path = 'urn:oasis:names:specification:ubl:schema:xsd'
+    UBL_NAMESPACES = {
+      'xmlns' => @namespace_path + ':Invoice-2',
+      'xmlns:cac' => @namespace_path + ':CommonAggregateComponents-2',
+      'xmlns:cbc' => @namespace_path + ':CommonBasicComponents-2'
+    }.freeze
 
     def initialize(provider = nil, customer = nil, date = nil)
       # @signature_path = config.signature_path
@@ -18,12 +23,15 @@ module SunatInvoice
     end
 
     def xml
-      parent_xml = Gyoku.xml(invoice: xml_hash)
-      child_xml = Gyoku.xml(ubl_ext('sac:AdditionalInformation' => {
-                                      # TODO: total taxs
-                                    }))
+      parent_xml = Gyoku.xml(xml_hash)
+      child_xml = Gyoku.xml(ubl_ext('sac:AdditionalInformation' => {}))
       concat_xml(parent_xml, child_xml, 'cac:InvoiceLine')
-      Nokogiri.XML(parent_xml).to_xml
+      concat_xml(parent_xml, @provider.xml, 'cac:Signature')
+
+      build = Nokogiri::XML::Builder.new do |xml|
+        xml.Invoice(UBL_NAMESPACES) { xml << parent_xml }
+      end
+      build.to_xml
     end
 
     def xml_hash
@@ -46,7 +54,7 @@ module SunatInvoice
     end
 
     def digital_signature
-      Gyoku.xml(ubl_ext(@providersignature_hash))
+      Gyoku.xml(ubl_ext(@provider.signature_hash))
     end
 
     def main_xml
@@ -70,10 +78,6 @@ module SunatInvoice
           }
         }
       }
-    end
-
-    def provider_xml
-      concat_xml(@provider.info, @provider.address, 'cac:PostalAddress')
     end
 
     def description_xml

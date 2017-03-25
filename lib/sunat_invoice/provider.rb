@@ -1,8 +1,11 @@
 # frozen_string_literal: true
 require_relative 'tributer'
+require_relative 'utils'
 
 module SunatInvoice
   class Provider < Tributer
+    include Utils
+
     attr_accessor :signature, :signature_id, :certificate
 
     def address
@@ -36,6 +39,10 @@ module SunatInvoice
       }
     end
 
+    def xml
+      concat_xml(Gyoku.xml(info), Gyoku.xml(address), 'cac:PostalAddress')
+    end
+
     def signature_reference
       {
         'ds:Transforms': {
@@ -59,10 +66,10 @@ module SunatInvoice
             'cac:PartyName' => {
               'cbc:Name' => @name
             },
-            'cac:PostalAddress' => {}
-          },
-          'cac:PartyLegalEntity' => {
-            'cbc:RegistrationName' => @registration_name
+            'cac:PostalAddress' => {},
+            'cac:PartyLegalEntity' => {
+              'cbc:RegistrationName' => @registration_name
+            }
           }
         }
       }
