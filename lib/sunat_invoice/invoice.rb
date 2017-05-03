@@ -9,15 +9,6 @@ module SunatInvoice
 
     attr_accessor :document_type, :document_number
 
-    @namespace_path = 'urn:oasis:names:specification:ubl:schema:xsd:'
-    UBL_NAMESPACES = {
-      'xmlns' => @namespace_path + 'Invoice-2',
-      'xmlns:cac' => @namespace_path + 'CommonAggregateComponents-2',
-      'xmlns:cbc' => @namespace_path + 'CommonBasicComponents-2',
-      'xmlns:ext' => @namespace_path + 'CommonExtensionComponents-2',
-      'xmlns:ds' => 'http://www.w3.org/2000/09/xmldsig#'
-    }.freeze
-
     def initialize(*args)
       @provider = args[0] || SunatInvoice::Provider.new
       @customer = args[1] || SunatInvoice::Customer.new

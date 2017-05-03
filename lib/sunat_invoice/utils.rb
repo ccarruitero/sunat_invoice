@@ -1,5 +1,14 @@
 # frozen_string_literal: false
 module Utils
+  @namespace_path = 'urn:oasis:names:specification:ubl:schema:xsd:'
+  UBL_NAMESPACES = {
+    'xmlns' => @namespace_path + 'Invoice-2',
+    'xmlns:cac' => @namespace_path + 'CommonAggregateComponents-2',
+    'xmlns:cbc' => @namespace_path + 'CommonBasicComponents-2',
+    'xmlns:ext' => @namespace_path + 'CommonExtensionComponents-2',
+    'xmlns:ds' => 'http://www.w3.org/2000/09/xmldsig#'
+  }.freeze
+
   def regex_type(mode, key)
     case mode
 
@@ -59,15 +68,15 @@ module Utils
   end
 
   def igv_tax(igv_amount)
-    main_xml = Gyoku.xml(igv_amount, 1000, 'IGV', 'VAT')
-    child_xml = Gyoku.xml('cbc:TaxExemptionReasonCode' => '10') # ?
-    concat_xml(main_xml, child_xml, 'cac:TaxCategory')
+    main_xml = Gyoku.xml(tax_scheme(igv_amount, 1000, 'IGV', 'VAT'))
+    child_xml = Gyoku.xml('cbc:TaxExemptionReasonCode' => '10')
+    concat_xml(main_xml, child_xml, 'cac:TaxCategory', 'inside')
   end
 
   def isc_tax(isc_amount)
-    main_xml = Gyoku.xml(tag_scheme(isc_amount, 2000, 'ISC', 'EXC'))
+    main_xml = Gyoku.xml(tax_scheme(isc_amount, 2000, 'ISC', 'EXC'))
     child_xml = Gyoku.xml('cbc:TierRange' => '02')
-    concat_xml(main_xml, child_xml, 'cac:TaxCategory')
+    concat_xml(main_xml, child_xml, 'cac:TaxCategory', 'inside')
   end
 
   def other_tax(other_amount)
