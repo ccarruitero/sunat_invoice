@@ -23,7 +23,8 @@ setup do
     document_type: 6
   )
   @invoice = SunatInvoice::Invoice.new(@provider, customer)
-  @parsed_xml = Nokogiri::XML(@invoice.xml) { |config| config.noblanks }
+  @invoice.items << SunatInvoice::Item.new
+  @parsed_xml = Nokogiri::XML(@invoice.xml, &:noblanks)
 end
 
 test 'is not broken' do

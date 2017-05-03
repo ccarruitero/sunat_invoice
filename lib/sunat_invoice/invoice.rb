@@ -7,7 +7,7 @@ module SunatInvoice
   class Invoice
     include Utils
 
-    attr_accessor :document_type, :document_number
+    attr_accessor :document_type, :document_number, :items
 
     def initialize(*args)
       @provider = args[0] || SunatInvoice::Provider.new
@@ -15,6 +15,7 @@ module SunatInvoice
       @date = args[2] || DateTime.now.strftime('%Y-%m-%d')
       @document_type = args[3] || '01'
       @document_number = args[4] || 'F001-1'
+      @items = []
     end
 
     def invoice_info
@@ -32,6 +33,8 @@ module SunatInvoice
       concat_xml(parent_xml, @provider.xml, 'cac:Signature')
       concat_xml(parent_xml, digital_signature, 'cbc:IssueDate')
       concat_xml(parent_xml, info_xml, 'cbc:IssueDate')
+
+      add_items(parent_xml)
 
       build = Nokogiri::XML::Builder.new do |xml|
         xml.Invoice(UBL_NAMESPACES) { xml << parent_xml }
@@ -68,6 +71,12 @@ module SunatInvoice
           }
         }
       }
+    end
+
+    def add_items(xml)
+      @items.each do |item|
+        xml << item.xml if item.is_a?(SunatInvoice::Item)
+      end
     end
 
     def description_xml
