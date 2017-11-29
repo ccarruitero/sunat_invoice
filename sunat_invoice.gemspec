@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.authors = ['César Carruitero']
   s.email = ['cesar@mozilla.pe']
   s.homepage = 'https://github.com/ccarruitero/sunat_invoice'
-  s.license = 'MPL'
+  s.license = 'MPL-2.0'
 
   s.files = `git ls-files`.split("\n")
 
