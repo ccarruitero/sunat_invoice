@@ -35,27 +35,20 @@ module SunatInvoice
           end
           @provider.info(xml)
           @customer.info(xml)
+          build_items(xml)
         end
       end
       build.to_xml
     end
 
-    def xml_hash
-      main_xml.merge(@customer.scheme)
-    end
-
-    def digital_signature
-      Gyoku.xml(ubl_ext(@provider.signature_hash))
-    end
-
-    def add_items(xml)
-      @items.each do |item|
-        xml << item.xml if item.is_a?(SunatInvoice::Item)
+    def build_items(xml)
+      items.each_with_index do |item, index|
+        item.xml(xml, index)
       end
     end
 
-    def description_xml
-      ubl_ext({})
+    def add_item(item)
+      items << item if item.is_a?(SunatInvoice::Item)
     end
 
     def attributes
