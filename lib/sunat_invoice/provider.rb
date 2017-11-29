@@ -6,15 +6,15 @@ module SunatInvoice
   class Provider < Tributer
     include Utils
 
-    attr_accessor :signature, :signature_id, :certificate
+    attr_accessor :signature, :signature_id, :certificate, :uri
 
     def address
       {
         'cbc:ID' => @ubigeo,
         'cbc:StreetName' => @street,
-        'cbc:CitySubdivisionName' => @urbanizacion,
-        'cbc:CityName' => @provincia,
-        'cbc:CountrySubentity' => @departamento,
+        'cbc:CitySubdivisionName' => @zone,
+        'cbc:CityName' => @province,
+        'cbc:CountrySubentity' => @departament,
         'cbc:District' => @district,
         'cac:Country' => {
           'cbc:IdentificationCode' => @country_code
@@ -83,7 +83,7 @@ module SunatInvoice
             },
             'cac:PostalAddress' => address,
             'cac:PartyLegalEntity' => {
-              'cbc:RegistrationName' => @registration_name
+              'cbc:RegistrationName' => @name
             }
           }
         }

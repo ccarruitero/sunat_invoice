@@ -6,20 +6,19 @@ setup do
   @provider = SunatInvoice::Provider.new(
     signature: FFaker::LoremCN.paragraph,
     ruc: FFaker::IdentificationMX.curp,
-    registration_name: FFaker::Company.name,
     name: FFaker::Company.name,
     document_type: 6,
     ubigeo: '14',
     street: '',
-    urbanizacion: '',
-    provincia: '',
-    departamento: '',
+    zone: '',
+    province: '',
+    department: '',
     district: '',
     country_code: ''
   )
   customer = SunatInvoice::Customer.new(
     ruc: FFaker::IdentificationMX.curp,
-    registration_name: FFaker::Company.name,
+    name: FFaker::Company.name,
     document_type: 6
   )
   @invoice = SunatInvoice::Invoice.new(@provider, customer)
@@ -59,7 +58,7 @@ end
 test 'has a registration name' do
   provider = @parsed_xml.xpath('//cac:AccountingSupplierParty/cac:Party')
   name = provider.xpath('//cac:PartyLegalEntity/cbc:RegistrationName')
-  assert name.first.content == @provider.registration_name
+  assert name.first.content == @provider.name
 end
 
 test 'has a name' do
@@ -77,14 +76,14 @@ test 'has an address' do
   assert street.first.content == @provider.street
 
   urbanizacion = provider.xpath('//cac:PostalAddress/cbc:CitySubdivisionName')
-  assert urbanizacion.first.content == @provider.urbanizacion
+  assert urbanizacion.first.content == @provider.zone
 
   provincia = provider.xpath('//cac:PostalAddress/cbc:CityName')
-  assert provincia.first.content == @provider.provincia
+  assert provincia.first.content == @provider.province
 
   # Departamento
   departamento = provider.xpath('//cac:PostalAddress/cbc:CountrySubentity')
-  assert departamento.first.content == @provider.departamento
+  assert departamento.first.content == @provider.department
 
   # Distrito
   distrito = provider.xpath('//cac:PostalAddress/cbc:District')
