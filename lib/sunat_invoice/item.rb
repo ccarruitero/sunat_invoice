@@ -2,11 +2,16 @@
 require_relative 'utils'
 
 module SunatInvoice
-  class Item
+  class Item < Model
     include Utils
 
     attr_accessor :quantity, :description, :price, :price_code, :unit_code,
-                  :igv, :isc, :other
+                  :taxes
+
+    def initialize(*args)
+      @taxes = []
+      super(*args)
+    end
 
     def bi_value
       sale_value / 1.18
@@ -36,12 +41,14 @@ module SunatInvoice
         end
         xml['cbc'].LineExtensionAmount sale_value
         xml['cbc'].ID(index + 1)
-        # taxs
+        taxes_xml(xml)
       end
     end
 
-    def taxs_xml
-      igv_tax(@igv_amount) + isc_tax(@isc_amount)
+    def taxes_xml(xml)
+      taxes&.each do |tax|
+        tax.xml(xml)
+      end
     end
   end
 end

@@ -3,11 +3,10 @@ require_relative 'helper'
 include SunatInvoice
 
 setup do
-  @item = SunatInvoice::Item.new
-  @item.quantity = 200
-  @item.description = 'item description'
-  @item.price = 69
-  @item.price_code = '01'
+  @item = SunatInvoice::Item.new( quantity: 200,
+                                  description: 'item description',
+                                  price: 69, price_code: '01')
+  @item.taxes << SunatInvoice::Tax.new(amount: 12.42, tax_type: :igv)
 end
 
 def invoice_setup
@@ -55,8 +54,8 @@ test 'has unit price' do
   assert_equal @item.price_code, price_type.first.content
 end
 
-test 'has taxs' do
+test 'has taxes' do
   invoice_setup
-  taxs = @item_xml.xpath('//cac:TaxTotal')
-  assert_equal 2, taxs.count
+  taxes = @item_xml.xpath('//cac:TaxTotal')
+  assert_equal 1, taxes.count
 end
