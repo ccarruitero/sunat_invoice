@@ -3,21 +3,16 @@ require_relative 'tributer'
 
 module SunatInvoice
   class Customer < Tributer
-    def scheme
-      {
-        'cac:AccountingCustomerParty' => {
-          'cbc:CustomerAssignedAccountID' => @ruc,
-          'cbc:AdditionalAccountID' => @document_type,
-          'cac:Party' => {
-            'cac:PartyLegalEntity' => {
-              'cbc:RegistrationName' => @registration_name
-            }
-          }
-        },
-        'cac:LegalMonetaryTotal' => {
-          'cbc:ChargeTotalAmount' => :total_amount
-        }
-      }
+    def info(xml)
+      xml['cac'].AccountingCustomerParty do
+        xml['cbc'].CustomerAssignedAccountID @ruc
+        xml['cbc'].AdditionalAccountID @document_type
+        xml['cac'].Party do
+          xml['cac'].PartyLegalEntity do
+            xml['cbc'].RegistrationName @name
+          end
+        end
+      end
     end
   end
 end

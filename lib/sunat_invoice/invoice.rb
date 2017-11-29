@@ -2,6 +2,7 @@
 require_relative 'utils'
 require_relative 'provider'
 require_relative 'customer'
+require_relative 'signature'
 
 module SunatInvoice
   class Invoice
@@ -16,28 +17,25 @@ module SunatInvoice
       @document_type = args[3] || '01'
       @document_number = args[4] || 'F001-1'
       @items = []
-    end
-
-    def invoice_info
-      {
-        'cbc:InvoiceTypeCode': @document_type,
-        'cbc:ID': @document_number
-      }
+      @signature = SunatInvoice::Signature.new(provider: @provider)
     end
 
     def xml
-      parent_xml = Gyoku.xml(xml_hash)
-      # child_xml = Gyoku.xml(ubl_ext('sac:AdditionalInformation' => {}))
-      info_xml = Gyoku.xml(invoice_info)
-      # concat_xml(parent_xml, child_xml, 'cac:InvoiceLine')
-      concat_xml(parent_xml, @provider.xml, 'cac:Signature')
-      concat_xml(parent_xml, digital_signature, 'cbc:IssueDate')
-      concat_xml(parent_xml, info_xml, 'cbc:IssueDate')
-
-      add_items(parent_xml)
-
       build = Nokogiri::XML::Builder.new do |xml|
-        xml.Invoice(UBL_NAMESPACES) { xml << parent_xml }
+        xml.Invoice(UBL_NAMESPACES) do
+          xml['cbc'].IssueDate @date
+          xml['cbc'].InvoiceTypeCode @document_type
+          xml['cbc'].ID @document_number
+
+          @signature.signer_data(xml)
+          xml['ext'].UBLExtensions do
+            ubl_ext(xml) do
+              @signature.signature_ext(xml)
+            end
+          end
+          @provider.info(xml)
+          @customer.info(xml)
+        end
       end
       build.to_xml
     end
@@ -48,29 +46,6 @@ module SunatInvoice
 
     def digital_signature
       Gyoku.xml(ubl_ext(@provider.signature_hash))
-    end
-
-    def main_xml
-      {
-        'cbc:IssueDate' => @date,
-        # '': digital_signature
-        'cac:Signature' => {
-          'cbc:ID' => @provider.signature,
-          'cac:SignatoryParty' => {
-            'cac:PartyIdentification' => {
-              'cbc:ID' => @provider.ruc
-            },
-            'cac:PartyName' => {
-              'cbc:Name' => @provider.name
-            }
-          },
-          'cac:DigitalSignatureAttachment' => {
-            'cac:ExternalReference' => {
-              'cbc:URI' => ''
-            }
-          }
-        }
-      }
     end
 
     def add_items(xml)
