@@ -3,10 +3,10 @@ require_relative 'helper'
 include SunatInvoice
 
 setup do
-  @item = SunatInvoice::Item.new( quantity: 200,
-                                  description: 'item description',
-                                  price: 69, price_code: '01')
+  @item = SunatInvoice::Item.new(quantity: 200, price: 69, price_code: '01',
+                                 description: 'item description')
   @item.taxes << SunatInvoice::Tax.new(amount: 12.42, tax_type: :igv)
+  invoice_setup
 end
 
 def invoice_setup
@@ -23,7 +23,6 @@ end
 
 # xml
 test 'has unit code and quantity' do
-  invoice_setup
   quantity = @item_xml.xpath('//cbc:InvoicedQuantity')
   assert quantity.count.positive?
   assert_equal @item.quantity.to_s, quantity.first.content
@@ -31,13 +30,11 @@ test 'has unit code and quantity' do
 end
 
 test 'has a description' do
-  invoice_setup
   description = @item_xml.xpath('//cbc:Description')
   assert_equal @item.description, description.first.content
 end
 
 test 'has unit price' do
-  invoice_setup
   price = @item_xml.xpath('//cac:Price/cbc:PriceAmount')
   assert_equal @item.bi_value.to_s, price.first.content
   # /Invoice/cac:InvoiceLine/cac:Price/cbc:PriceAmount/@currencyID
@@ -46,7 +43,8 @@ test 'has unit price' do
   alt_condition_price = ref_pricing.xpath('//cac:AlternativeConditionPrice')
   assert_equal 1, alt_condition_price.count
 
-  alt_price = ref_pricing.xpath('//cac:AlternativeConditionPrice/cbc:PriceAmount')
+  tag = '//cac:AlternativeConditionPrice/cbc:PriceAmount'
+  alt_price = ref_pricing.xpath(tag)
   assert_equal @item.price.to_s, alt_price.first.content
   # //cac:AlternativeConditionPrice/cbc:PriceAmount/@currencyID
 
@@ -54,8 +52,28 @@ test 'has unit price' do
   assert_equal @item.price_code, price_type.first.content
 end
 
+# taxes
 test 'has taxes' do
-  invoice_setup
   taxes = @item_xml.xpath('//cac:TaxTotal')
   assert_equal 1, taxes.count
+end
+
+test 'has amount in correct tag' do
+  tag_path = '//cac:TaxTotal/cbc:TaxAmount'
+  amount = @item_xml.xpath(tag_path)
+  assert_equal amount.count, 1
+  assert_equal amount.first.content, '12.42'
+  # cac:TaxTotal/cbc:TaxAmount/@currencyID
+end
+
+test 'has correct values in TaxScheme' do
+  tag_path = '//cac:TaxTotal/cac:TaxSubtotal/cac:TaxCategory/cac:TaxScheme'
+  id = @item_xml.xpath("#{tag_path}/cbc:ID")
+  assert_equal id.first.content, '1000'
+
+  name = @item_xml.xpath("#{tag_path}/cbc:Name")
+  assert_equal name.first.content, 'IGV'
+
+  tax_code = @item_xml.xpath("#{tag_path}/cbc:TaxTypeCode")
+  assert_equal tax_code.first.content, 'VAT'
 end
