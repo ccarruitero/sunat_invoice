@@ -1,4 +1,7 @@
 # frozen_string_literal: true
+
+require_relative 'catalogs'
+
 module SunatInvoice
   class Tax < Model
     TAXES = {
@@ -8,6 +11,20 @@ module SunatInvoice
     }.freeze
 
     attr_accessor :amount, :tax_type, :tax_exemption_reason, :tier_range
+
+    def initialize(*args)
+      super(*args)
+      defaults_for_type(tax_type)
+    end
+
+    def defaults_for_type(type)
+      case type
+      when :igv
+        @tax_exemption_reason ||= Catalogs::CATALOG_07.first
+      when :isc
+        @tier_range ||= Catalogs::CATALOG_08.first
+      end
+    end
 
     def xml(xml)
       xml['cac'].TaxTotal do
