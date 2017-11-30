@@ -132,7 +132,7 @@ test 'has total by kind of sale' do
   additional_info = @parsed_xml.xpath(tag)
   assert additional_info.count.positive?
   assert_equal additional_info.first.children.count, 1
-  amount_tag ='//sac:AdditionalMonetaryTotal/cbc:PayableAmount'
+  amount_tag = '//sac:AdditionalMonetaryTotal/cbc:PayableAmount'
   assert_equal additional_info.xpath(amount_tag).first.content.to_f, 200.to_f
 end
 
@@ -143,7 +143,7 @@ end
 
 test '#calculate_tax_totals' do
   tax = FactoryBot.build(:tax, amount: 15)
-  invoice = SunatInvoice::Invoice.new
+  invoice = FactoryBot.build(:invoice)
   2.times do
     invoice.items << FactoryBot.build(:item, taxes: [tax])
   end
