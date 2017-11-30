@@ -22,7 +22,9 @@ setup do
     document_type: 6
   )
   @invoice = SunatInvoice::Invoice.new(@provider, customer)
-  @invoice.items << SunatInvoice::Item.new
+  tax = SunatInvoice::Tax.new(amount: 3.6, tax_type: :igv)
+  item_attr = { quantity: 10, price: 20, price_code: '01', taxes: [tax] }
+  @invoice.items << SunatInvoice::Item.new(item_attr)
   @parsed_xml = Nokogiri::XML(@invoice.xml, &:noblanks)
 end
 
@@ -123,6 +125,15 @@ end
 test 'has at least one item' do
   item = @parsed_xml.xpath('//cac:InvoiceLine')
   assert item.count.positive?
+end
+
+test 'has total by kind of sale' do
+  tag = '//ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sac:AdditionalInformation'
+  additional_info = @parsed_xml.xpath(tag)
+  assert additional_info.count.positive?
+  assert_equal additional_info.first.children.count, 1
+  amount_tag ='//sac:AdditionalMonetaryTotal/cbc:PayableAmount'
+  assert_equal additional_info.xpath(amount_tag).first.content.to_f, 200.to_f
 end
 
 test 'has total tag' do

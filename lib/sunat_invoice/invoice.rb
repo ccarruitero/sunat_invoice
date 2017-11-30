@@ -59,13 +59,9 @@ module SunatInvoice
     def calculate_total
       # calculate invoice total
       total = 0
-      sum_total(@tax_totals, total)
-      sum_total(@sale_totals, total)
+      total += @tax_totals.values.sum
+      total += @sale_totals.values.sum
       @total = total
-    end
-
-    def sum_total(array, total)
-      array.each { |_code, amount| total += amount }
     end
 
     def calculate_sale_totals
