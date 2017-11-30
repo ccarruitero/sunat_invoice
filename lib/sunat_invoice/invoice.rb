@@ -21,8 +21,6 @@ module SunatInvoice
       @items = []
       @signature = SunatInvoice::Signature.new(provider: @provider)
       @currency = 'PEN'
-      @sale_totals = {}
-      @tax_totals = {}
     end
 
     def xml
@@ -65,6 +63,7 @@ module SunatInvoice
     end
 
     def calculate_sale_totals
+      @sale_totals = {}
       # get bi totals according kind of sale (gravado, inafecto, exonerado ..)
       items.each do |item|
         # TODO: I think in most cases only be one tax for item, but should
@@ -78,6 +77,7 @@ module SunatInvoice
     end
 
     def calculate_tax_totals
+      @tax_totals = {}
       taxes = items.map(&:taxes).flatten
       taxes.each do |tax|
         @tax_totals[tax.tax_type] = 0 unless @tax_totals[tax.tax_type]
