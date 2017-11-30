@@ -54,12 +54,12 @@ end
 
 # taxes
 test 'has taxes' do
-  taxes = @item_xml.xpath('//cac:TaxTotal')
+  taxes = @item_xml.xpath('//cac:InvoiceLine/cac:TaxTotal')
   assert_equal 1, taxes.count
 end
 
 test 'has amount in correct tag' do
-  tag_path = '//cac:TaxTotal/cbc:TaxAmount'
+  tag_path = '//cac:InvoiceLine/cac:TaxTotal/cbc:TaxAmount'
   amount = @item_xml.xpath(tag_path)
   assert_equal amount.count, 1
   assert_equal amount.first.content, '12.42'

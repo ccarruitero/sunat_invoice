@@ -3,6 +3,7 @@ require_relative 'utils'
 require_relative 'provider'
 require_relative 'customer'
 require_relative 'signature'
+require_relative 'tax'
 
 module SunatInvoice
   class Invoice
@@ -24,7 +25,7 @@ module SunatInvoice
     end
 
     def xml
-      calculate_totals
+      prepare_totals
 
       build = Nokogiri::XML::Builder.new do |xml|
         xml.Invoice(UBL_NAMESPACES) do
@@ -40,12 +41,13 @@ module SunatInvoice
           @provider.info(xml)
           @customer.info(xml)
           build_items(xml)
+          build_tax_totals(xml)
         end
       end
       build.to_xml
     end
 
-    def calculate_totals
+    def prepare_totals
       calculate_tax_totals
     end
 
@@ -60,6 +62,12 @@ module SunatInvoice
     def build_items(xml)
       items.each_with_index do |item, index|
         item.xml(xml, index)
+      end
+    end
+
+    def build_tax_totals(xml)
+      @tax_totals.each do |key, value|
+        SunatInvoice::Tax.new(tax_type: key, amount: value).xml(xml)
       end
     end
 

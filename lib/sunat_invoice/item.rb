@@ -9,12 +9,12 @@ module SunatInvoice
                   :taxes
 
     def initialize(*args)
-      @taxes = []
+      @taxes ||= []
       super(*args)
     end
 
     def bi_value
-      sale_value / 1.18
+      @price
     end
 
     def sale_value
