@@ -77,3 +77,27 @@ test 'has correct values in TaxScheme' do
   tax_code = @item_xml.xpath("#{tag_path}/cbc:TaxTypeCode")
   assert_equal tax_code.first.content, 'VAT'
 end
+
+scope '#sale_taxes' do
+  setup do
+    tax = SunatInvoice::Tax.new(amount: 10.8, tax_type: :igv)
+    @item = SunatInvoice::Item.new(quantity: 2, price: 60, taxes: [tax])
+  end
+
+  test 'return a hash' do
+    assert_equal @item.sale_taxes.class, Hash
+  end
+
+  test 'has tax_type and total tax for item' do
+    assert_equal @item.sale_taxes.count, 1
+    assert_equal @item.sale_taxes.keys, [:igv]
+    assert_equal @item.sale_taxes.values, [21.6]
+  end
+
+  test 'has sum by tax_type' do
+    @item.taxes << SunatInvoice::Tax.new(amount: 5, tax_type: :isc)
+    assert_equal @item.sale_taxes.count, 2
+    assert_equal @item.sale_taxes.keys, [:igv, :isc]
+    assert_equal @item.sale_taxes.values, [21.6, 10]
+  end
+end

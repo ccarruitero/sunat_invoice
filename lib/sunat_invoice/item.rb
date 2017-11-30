@@ -17,13 +17,23 @@ module SunatInvoice
       #   UN/ECE rec 20- Unit Of Measure
       #   http://www.unece.org/fileadmin/DAM/cefact/recommendations/rec20/rec20_rev3_Annex2e.pdf
       # * taxes - An array of SunatInvoice::Tax
-      @taxes ||= []
       super(*args)
+      @taxes ||= []
     end
 
     def bi_value
       # bi of sale = price without taxes * quantity
       (@price.to_f * @quantity.to_f).round(2)
+    end
+
+    def sale_taxes
+      # generate and object with taxes sum by type
+      sums = {}
+      taxes.each do |tax|
+        sums[tax.tax_type] ||= 0
+        sums[tax.tax_type] = (tax.amount.to_f * quantity.to_f).round(2)
+      end
+      sums
     end
 
     def sale_price
