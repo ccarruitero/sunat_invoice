@@ -4,6 +4,7 @@ require_relative 'provider'
 require_relative 'customer'
 require_relative 'signature'
 require_relative 'tax'
+require_relative 'catalogs'
 
 module SunatInvoice
   class Invoice
@@ -20,7 +21,7 @@ module SunatInvoice
       @items = []
       @signature = SunatInvoice::Signature.new(provider: @provider)
       @currency = 'PEN'
-      @totals = []
+      @sale_totals = {}
       @tax_totals = {}
     end
 
@@ -37,6 +38,7 @@ module SunatInvoice
           @signature.signer_data(xml)
           xml['ext'].UBLExtensions do
             @signature.signature_ext(xml)
+            build_sale_totals(xml)
           end
           @provider.info(xml)
           @customer.info(xml)
@@ -49,6 +51,19 @@ module SunatInvoice
 
     def prepare_totals
       calculate_tax_totals
+      calculate_sale_totals
+    end
+
+    def calculate_sale_totals
+      items.each do |item|
+        # TODO: I think in most case only was one tax for item, but should
+        #       handle other cases
+        total_code = get_total_code(item.taxes.first)
+        if total_code
+          @sale_totals[total_code] = 0 unless @sale_totals[total_code]
+          @sale_totals[total_code] += item.bi_value
+        end
+      end
     end
 
     def calculate_tax_totals
@@ -71,8 +86,43 @@ module SunatInvoice
       end
     end
 
+    def build_sale_totals(xml)
+      ubl_ext(xml) do
+        xml['sac'].AdditionalInformation do
+          @sale_totals.each do |code, amount|
+            xml['sac'].AdditionalMonetaryTotal do
+              xml['cbc'].ID code
+              xml['cbc'].PayableAmount amount
+            end
+          end
+        end
+      end
+    end
+
     def add_item(item)
       items << item if item.is_a?(SunatInvoice::Item)
+    end
+
+    def get_total_code(tax)
+      return unless tax
+      case tax.tax_type
+      when :igv
+        get_total_igv_code(tax.tax_exemption_reason)
+      # when :isc
+      #   tax.tier_range
+      end
+    end
+
+    def get_total_igv_code(exemption_reason)
+      if Catalogs::CATALOG_07.first == exemption_reason
+        Catalogs::CATALOG_14.first
+      elsif Catalogs::CATALOG_07[1..6].include?(exemption_reason)
+        Catalogs::CATALOG_14[3]
+      elsif Catalogs::CATALOG_07[7] == exemption_reason
+        Catalogs::CATALOG_14[2]
+      elsif Catalogs::CATALOG_07[8..14].include?(exemption_reason)
+        Catalogs::CATALOG_14[1]
+      end
     end
 
     def attributes

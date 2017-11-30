@@ -135,3 +135,12 @@ test '#calculate_tax_totals' do
   assert tax_totals.count == 1
   assert tax_totals[:igv] == 30
 end
+
+test '#get_total_igv_code' do
+  invoice = SunatInvoice::Invoice.new
+  assert invoice.get_total_igv_code('11') == '1004'
+  assert invoice.get_total_igv_code('15') == '1004'
+  assert invoice.get_total_igv_code('20') == '1003'
+  assert invoice.get_total_igv_code('32') == '1002'
+  assert invoice.get_total_igv_code('42') == nil
+end
