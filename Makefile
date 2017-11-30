@@ -4,5 +4,5 @@ console:
 	irb -Ilib -rsunat_invoice
 
 test:
-	cutest test/*.rb
+	cutest test/**/*_test.rb
 	rubocop
