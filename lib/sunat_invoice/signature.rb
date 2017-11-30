@@ -1,8 +1,11 @@
 # frozen_string_literal: true
 require_relative 'model'
+require_relative 'utils'
 
 module SunatInvoice
   class Signature < Model
+    include Utils
+
     C14N_ALGORITHM            = 'http://www.w3.org/TR/2001/REC-xml-c14n-20010315'
     DIGEST_ALGORITHM          = 'http://www.w3.org/2000/09/xmldsig#sha1'
     SIGNATURE_ALGORITHM       = 'http://www.w3.org/2000/09/xmldsig#rsa-sha1'
@@ -30,9 +33,11 @@ module SunatInvoice
     end
 
     def signature_ext(xml)
-      xml['ds'].Signature(Id: provider.signature_id) do
-        signed_info xml
-        signature_value xml
+      ubl_ext(xml) do
+        xml['ds'].Signature(Id: provider.signature_id) do
+          signed_info xml
+          signature_value xml
+        end
       end
     end
 
