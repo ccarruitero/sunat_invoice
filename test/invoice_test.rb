@@ -142,14 +142,15 @@ test 'has total tag' do
 end
 
 test '#calculate_tax_totals' do
-  tax = SunatInvoice::Tax.new(amount: 15, tax_type: :igv)
+  tax = FactoryBot.build(:tax, amount: 15)
+  invoice = SunatInvoice::Invoice.new
   2.times do
-    @invoice.items << SunatInvoice::Item.new(taxes: [tax])
+    invoice.items << FactoryBot.build(:item, taxes: [tax])
   end
-  @invoice.calculate_tax_totals
-  tax_totals = @invoice.instance_variable_get('@tax_totals')
+  invoice.calculate_tax_totals
+  tax_totals = invoice.instance_variable_get('@tax_totals')
   assert_equal tax_totals.count, 1
-  assert_equal tax_totals[:igv], 30
+  assert_equal tax_totals[:igv], 300
 end
 
 test '#get_total_igv_code' do

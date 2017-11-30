@@ -56,10 +56,9 @@ module SunatInvoice
 
     def calculate_total
       # calculate invoice total
-      total = 0
-      total += @tax_totals.values.sum
-      total += @sale_totals.values.sum
-      @total = total
+      @total = 0
+      @total += @tax_totals.values.sum
+      @total += @sale_totals.values.sum
     end
 
     def calculate_sale_totals
@@ -77,11 +76,12 @@ module SunatInvoice
     end
 
     def calculate_tax_totals
+      # concat item's sale_taxes
       @tax_totals = {}
-      taxes = items.map(&:taxes).flatten
+      taxes = items.map(&:sale_taxes).flatten
       taxes.each do |tax|
-        @tax_totals[tax.tax_type] = 0 unless @tax_totals[tax.tax_type]
-        @tax_totals[tax.tax_type] += tax.amount
+        @tax_totals[tax.keys.first] ||= 0
+        @tax_totals[tax.keys.first] += tax.values.sum
       end
     end
 
