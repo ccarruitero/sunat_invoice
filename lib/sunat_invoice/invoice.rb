@@ -71,8 +71,8 @@ module SunatInvoice
     def calculate_sale_totals
       # get bi totals according kind of sale (gravado, inafecto, exonerado ..)
       items.each do |item|
-        # TODO: I think in most case only was one tax for item, but should
-        #       handle other cases
+        # TODO: I think in most cases only be one tax for item, but should
+        #       handle more cases
         total_code = get_total_code(item.taxes.first)
         if total_code
           @sale_totals[total_code] = 0 unless @sale_totals[total_code]
