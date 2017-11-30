@@ -18,20 +18,24 @@ module SunatInvoice
       @document_number = args[4] || 'F001-1'
       @items = []
       @signature = SunatInvoice::Signature.new(provider: @provider)
+      @currency = 'PEN'
+      @totals = []
+      @tax_totals = {}
     end
 
     def xml
+      calculate_totals
+
       build = Nokogiri::XML::Builder.new do |xml|
         xml.Invoice(UBL_NAMESPACES) do
           xml['cbc'].IssueDate @date
           xml['cbc'].InvoiceTypeCode @document_type
           xml['cbc'].ID @document_number
+          xml['cbc'].DocumentCurrencyCode @currency
 
           @signature.signer_data(xml)
           xml['ext'].UBLExtensions do
-            ubl_ext(xml) do
-              @signature.signature_ext(xml)
-            end
+            @signature.signature_ext(xml)
           end
           @provider.info(xml)
           @customer.info(xml)
@@ -39,6 +43,18 @@ module SunatInvoice
         end
       end
       build.to_xml
+    end
+
+    def calculate_totals
+      calculate_tax_totals
+    end
+
+    def calculate_tax_totals
+      taxes = items.map(&:taxes).flatten
+      taxes.each do |tax|
+        @tax_totals[tax.tax_type] = 0 unless @tax_totals[tax.tax_type]
+        @tax_totals[tax.tax_type] += tax.amount
+      end
     end
 
     def build_items(xml)

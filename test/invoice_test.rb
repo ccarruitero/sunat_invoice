@@ -125,5 +125,13 @@ test 'has at least one item' do
   assert item.count.positive?
 end
 
-test 'has taxs' do
+test '#calculate_tax_totals' do
+  tax = SunatInvoice::Tax.new(amount: 15, tax_type: :igv)
+  2.times do
+    @invoice.items << SunatInvoice::Item.new(taxes: [tax])
+  end
+  @invoice.calculate_tax_totals
+  tax_totals = @invoice.instance_variable_get('@tax_totals')
+  assert tax_totals.count == 1
+  assert tax_totals[:igv] == 30
 end
