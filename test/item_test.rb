@@ -34,9 +34,9 @@ test 'has a description' do
   assert_equal @item.description, description.first.content
 end
 
-test 'has unit price' do
+test 'has unit prices' do
   price = @item_xml.xpath('//cac:Price/cbc:PriceAmount')
-  assert_equal @item.bi_value.to_s, price.first.content
+  assert_equal @item.price.to_s, price.first.content
   # /Invoice/cac:InvoiceLine/cac:Price/cbc:PriceAmount/@currencyID
 
   ref_pricing = @item_xml.xpath('//cac:PricingReference')
@@ -45,7 +45,7 @@ test 'has unit price' do
 
   tag = '//cac:AlternativeConditionPrice/cbc:PriceAmount'
   alt_price = ref_pricing.xpath(tag)
-  assert_equal @item.price.to_s, alt_price.first.content
+  assert_equal @item.sale_price.to_s, alt_price.first.content
   # //cac:AlternativeConditionPrice/cbc:PriceAmount/@currencyID
 
   price_type = alt_condition_price.xpath('//cbc:PriceTypeCode')

@@ -9,21 +9,33 @@ module SunatInvoice
                   :taxes
 
     def initialize(*args)
+      # * quantity - quantity of item
+      # * description - name or description of product or service
+      # * price - unit price without taxes
+      # * price_code - type unit price (Catalogs::CATALOG_16)
+      # * unit_code - unit of measure
+      #   UN/ECE rec 20- Unit Of Measure
+      #   http://www.unece.org/fileadmin/DAM/cefact/recommendations/rec20/rec20_rev3_Annex2e.pdf
+      # * taxes - An array of SunatInvoice::Tax
       @taxes ||= []
       super(*args)
     end
 
     def bi_value
-      @price
+      # bi of sale = price without taxes * quantity
+      (@price.to_f * @quantity.to_f).round(2)
     end
 
-    def sale_value
-      @price.to_f * @quantity.to_f
+    def sale_price
+      # unit price with tax
+      (@price.to_f + sum_taxes).round(2)
+    end
+
+    def sum_taxes
+      taxes.map(&:amount).sum
     end
 
     def xml(xml, index)
-      # UN/ECE rec 20- Unit Of Measure
-      # http://www.unece.org/fileadmin/DAM/cefact/recommendations/rec20/rec20_rev3_Annex2e.pdf
       xml['cac'].InvoiceLine do
         xml['cac'].Item do
           xml['cbc'].Description @description
@@ -31,15 +43,15 @@ module SunatInvoice
         xml['cbc'].InvoicedQuantity @quantity
         # TODO: add attributes
         xml['cac'].Price do
-          xml['cbc'].PriceAmount bi_value # valor unitario
+          xml['cbc'].PriceAmount @price
         end
         xml['cac'].PricingReference do
           xml['cac'].AlternativeConditionPrice do
-            xml['cbc'].PriceAmount @price # precio venta
+            xml['cbc'].PriceAmount sale_price
             xml['cbc'].PriceTypeCode @price_code
           end
         end
-        xml['cbc'].LineExtensionAmount sale_value
+        xml['cbc'].LineExtensionAmount bi_value
         xml['cbc'].ID(index + 1)
         taxes_xml(xml)
       end
