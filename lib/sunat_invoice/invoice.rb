@@ -44,6 +44,7 @@ module SunatInvoice
           @customer.info(xml)
           build_items(xml)
           build_tax_totals(xml)
+          build_total(xml)
         end
       end
       build.to_xml
@@ -52,9 +53,23 @@ module SunatInvoice
     def prepare_totals
       calculate_tax_totals
       calculate_sale_totals
+      calculate_total
+    end
+
+    def calculate_total
+      # calculate invoice total
+      total = 0
+      sum_total(@tax_totals, total)
+      sum_total(@sale_totals, total)
+      @total = total
+    end
+
+    def sum_total(array, total)
+      array.each { |_code, amount| total += amount }
     end
 
     def calculate_sale_totals
+      # get bi totals according kind of sale (gravado, inafecto, exonerado ..)
       items.each do |item|
         # TODO: I think in most case only was one tax for item, but should
         #       handle other cases
@@ -96,6 +111,12 @@ module SunatInvoice
             end
           end
         end
+      end
+    end
+
+    def build_total(xml)
+      xml['cac'].LegalMonetaryTotal do
+        xml['cbc'].PayableAmount @total
       end
     end
 
