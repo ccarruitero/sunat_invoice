@@ -22,7 +22,7 @@ setup do
     name: FFaker::Company.name,
     document_type: 6
   )
-  @invoice = SunatInvoice::Invoice.new(@provider, customer)
+  @invoice = SunatInvoice::Invoice.new(provider: @provider, customer: customer)
   tax = SunatInvoice::Tax.new(amount: 3.6, tax_type: :igv)
   item_attr = { quantity: 10, price: 20, price_code: '01', taxes: [tax] }
   @invoice.items << SunatInvoice::Item.new(item_attr)

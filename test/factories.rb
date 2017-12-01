@@ -11,10 +11,14 @@ FactoryBot.define do
   end
 
   factory :invoice, class: 'SunatInvoice::Invoice' do
+    provider { build(:provider) }
+
+    initialize_with { new(attributes) }
   end
 
   factory :provider, class: 'SunatInvoice::Provider' do
-    signature FFaker::LoremCN.paragraph
+    pk_file File.join(File.dirname(__FILE__), 'certs/pk_file')
+    cert_file File.join(File.dirname(__FILE__), 'certs/cert_file')
     ruc FFaker::IdentificationMX.curp
     name FFaker::Company.name
     document_type 6
@@ -25,11 +29,15 @@ FactoryBot.define do
     department ''
     district ''
     country_code ''
+
+    initialize_with { new(attributes) }
   end
 
   factory :customer, class: 'SunatInvoice::Customer' do
     ruc FFaker::IdentificationMX.curp
     name FFaker::Company.name
     document_type 6
+
+    initialize_with { new(attributes) }
   end
 end

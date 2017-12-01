@@ -7,17 +7,19 @@ require_relative 'tax'
 require_relative 'catalogs'
 
 module SunatInvoice
-  class Invoice
+  class Invoice < Model
     include Utils
 
     attr_accessor :document_type, :document_number, :items
 
     def initialize(*args)
-      @provider = args[0] || SunatInvoice::Provider.new
-      @customer = args[1] || SunatInvoice::Customer.new
-      @date = args[2] || DateTime.now.strftime('%Y-%m-%d')
-      @document_type = args[3] || '01'
-      @document_number = args[4] || 'F001-1'
+      super(*args)
+      opts = args[0] || {}
+      @provider = opts[:provider] || SunatInvoice::Provider.new
+      @customer = opts[:customer] || SunatInvoice::Customer.new
+      @date = opts[:date] || DateTime.now.strftime('%Y-%m-%d')
+      @document_type = opts[:document_type] || '01'
+      @document_number = opts[:document_number] || 'F001-1'
       @items = []
       @signature = SunatInvoice::Signature.new(provider: @provider)
       @currency = 'PEN'
