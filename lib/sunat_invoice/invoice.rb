@@ -20,9 +20,9 @@ module SunatInvoice
       @date = opts[:date] || DateTime.now.strftime('%Y-%m-%d')
       @document_type = opts[:document_type] || '01'
       @document_number = opts[:document_number] || 'F001-1'
+      @currency = opts[:currency] || 'PEN'
       @items = []
       @signature = SunatInvoice::Signature.new(provider: @provider)
-      @currency = opts[:currency] || 'PEN'
     end
 
     def xml
@@ -96,7 +96,7 @@ module SunatInvoice
 
     def build_tax_totals(xml)
       @tax_totals.each do |key, value|
-        SunatInvoice::Tax.new(tax_type: key, amount: value).xml(xml)
+        SunatInvoice::Tax.new(tax_type: key, amount: value).xml(xml, @currency)
       end
     end
 
@@ -106,7 +106,7 @@ module SunatInvoice
           @sale_totals.each do |code, amount|
             xml['sac'].AdditionalMonetaryTotal do
               xml['cbc'].ID code
-              xml['cbc'].PayableAmount amount
+              amount_xml(xml['cbc'], 'PayableAmount', amount, @currency)
             end
           end
         end

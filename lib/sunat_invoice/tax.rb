@@ -1,9 +1,12 @@
 # frozen_string_literal: true
 
 require_relative 'catalogs'
+require_relative 'utils'
 
 module SunatInvoice
   class Tax < Model
+    include Utils
+
     TAXES = {
       igv: { id: '1000', name: 'IGV', tax_type_code: 'VAT' },
       isc: { id: '2000', name: 'ISC', tax_type_code: 'EXC' },
@@ -26,11 +29,11 @@ module SunatInvoice
       end
     end
 
-    def xml(xml)
+    def xml(xml, currency)
       xml['cac'].TaxTotal do
-        xml['cbc'].TaxAmount amount
+        amount_xml(xml['cbc'], 'TaxAmount', amount, currency)
         xml['cac'].TaxSubtotal do
-          xml['cbc'].TaxAmount amount
+          amount_xml(xml['cbc'], 'TaxAmount', amount, currency)
           tax_category(xml)
         end
       end

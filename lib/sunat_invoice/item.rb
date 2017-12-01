@@ -60,7 +60,7 @@ module SunatInvoice
         end
         amount_xml(xml['cbc'], 'LineExtensionAmount', bi_value, currency)
         xml['cbc'].ID(index + 1)
-        taxes_xml(xml)
+        taxes_xml(xml, currency)
       end
     end
 
@@ -70,9 +70,9 @@ module SunatInvoice
       end
     end
 
-    def taxes_xml(xml)
+    def taxes_xml(xml, currency)
       taxes&.each do |tax|
-        tax.xml(xml)
+        tax.xml(xml, currency)
       end
     end
   end
