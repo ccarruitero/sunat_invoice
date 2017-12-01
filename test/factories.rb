@@ -12,6 +12,7 @@ FactoryBot.define do
 
   factory :invoice, class: 'SunatInvoice::Invoice' do
     provider { build(:provider) }
+    customer { build(:customer) }
 
     initialize_with { new(attributes) }
   end

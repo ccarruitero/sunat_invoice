@@ -3,26 +3,8 @@ require_relative 'helper'
 include SunatInvoice
 
 setup do
-  @provider = SunatInvoice::Provider.new(
-    pk_file: File.join(File.dirname(__FILE__), 'certs/pk_file'),
-    cert_file: File.join(File.dirname(__FILE__), 'certs/cert_file'),
-    ruc: FFaker::IdentificationMX.curp,
-    name: FFaker::Company.name,
-    document_type: 6,
-    ubigeo: '14',
-    street: '',
-    zone: '',
-    province: '',
-    department: '',
-    district: '',
-    country_code: ''
-  )
-  customer = SunatInvoice::Customer.new(
-    ruc: FFaker::IdentificationMX.curp,
-    name: FFaker::Company.name,
-    document_type: 6
-  )
-  @invoice = SunatInvoice::Invoice.new(provider: @provider, customer: customer)
+  @provider = FactoryBot.build(:provider)
+  @invoice = FactoryBot.build(:invoice, provider: @provider)
   tax = SunatInvoice::Tax.new(amount: 3.6, tax_type: :igv)
   item_attr = { quantity: 10, price: 20, price_code: '01', taxes: [tax] }
   @invoice.items << SunatInvoice::Item.new(item_attr)
