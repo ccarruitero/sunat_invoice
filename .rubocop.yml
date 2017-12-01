@@ -2,5 +2,10 @@ AllCops:
   TargetRubyVersion: 2.3
 Style/Documentation:
   Enabled: false
+Style/AsciiComments :
+  Enabled: false
+Metrics/BlockLength:
+  Exclude:
+    - 'test/*.rb'
 Metrics/MethodLength:
   Max: 20
