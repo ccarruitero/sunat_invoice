@@ -4,8 +4,8 @@ include SunatInvoice
 
 setup do
   @provider = SunatInvoice::Provider.new(
-    pk_file: File.join(File.dirname(__FILE__), 'fixtures/pk_file'),
-    cert_file: File.join(File.dirname(__FILE__), 'fixtures/cert_file'),
+    pk_file: File.join(File.dirname(__FILE__), 'certs/pk_file'),
+    cert_file: File.join(File.dirname(__FILE__), 'certs/cert_file'),
     ruc: FFaker::IdentificationMX.curp,
     name: FFaker::Company.name,
     document_type: 6,
