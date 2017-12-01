@@ -68,20 +68,20 @@ module SunatInvoice
     end
 
     def signature_value(xml)
-      info = xml.at('//ds:SignedInfo') # xml.xpath('//ds:SignedInfo').first
-      info_canonicalized = canonicalize(info)
+      info = xml.at('//ds:SignedInfo')
+      info_canonicalized = canonicalize(info).to_s
       xml['ds'].SignatureValue sign_info(info_canonicalized)
       xml['ds'].KeyInfo do
         xml['ds'].X509Data do
-         xml['ds'].X509Certificate certificate
+          xml['ds'].X509Certificate certificate
         end
       end
     end
 
     private
 
-    def sign_info(xml)
-      Base64.strict_encode64(private_key.sign(OpenSSL::Digest::SHA1.new, xml.to_s))
+    def sign_info(text)
+      Base64.strict_encode64(private_key.sign(OpenSSL::Digest::SHA1.new, text))
     end
 
     def digest(text)
