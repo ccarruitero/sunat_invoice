@@ -6,7 +6,7 @@ module SunatInvoice
   class Provider < Tributer
     include Utils
 
-    attr_accessor :signature, :signature_id, :certificate, :uri
+    attr_accessor :signature_id, :uri, :pk_file, :cert_file
 
     def address(xml)
       xml['cbc'].ID @ubigeo

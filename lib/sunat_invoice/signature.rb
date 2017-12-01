@@ -68,16 +68,36 @@ module SunatInvoice
     end
 
     def signature_value(xml)
-      xml['ds'].SignatureValue provider.signature
+      info = xml.at('//ds:SignedInfo') # xml.xpath('//ds:SignedInfo').first
+      info_canonicalized = canonicalize(info)
+      xml['ds'].SignatureValue sign_info(info_canonicalized)
       xml['ds'].KeyInfo do
         xml['ds'].X509Data do
-          xml['ds'].X509Certificate provider.certificate
+         xml['ds'].X509Certificate certificate
         end
       end
     end
 
+    private
+
+    def sign_info(xml)
+      Base64.strict_encode64(private_key.sign(OpenSSL::Digest::SHA1.new, xml.to_s))
+    end
+
     def digest(text)
       OpenSSL::Digest::SHA1.new.base64digest(text)
+    end
+
+    def canonicalize(info)
+      info.canonicalize(Nokogiri::XML::XML_C14N_EXCLUSIVE_1_0, ['soap', 'web'])
+    end
+
+    def private_key
+      OpenSSL::PKey::RSA.new(File.read(provider.pk_file))
+    end
+
+    def certificate
+      OpenSSL::X509::Certificate.new(File.read(provider.cert_file))
     end
   end
 end
