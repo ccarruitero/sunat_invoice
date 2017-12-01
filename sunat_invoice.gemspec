@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 Gem::Specification.new do |s|
   s.name = 'sunat_invoice'
   s.version = '0.0.1'
@@ -11,14 +12,12 @@ Gem::Specification.new do |s|
 
   s.files = `git ls-files`.split("\n")
 
-  s.add_runtime_dependency 'savon', '2.11.1'
-
-  s.add_dependency 'gyoku', '1.3.1'
-  s.add_dependency 'nokogiri', '~> 1.7'
+  s.add_dependency 'savon', '~> 2.11.2'
+  s.add_dependency 'nokogiri', '~> 1.8'
 
   s.add_development_dependency 'cutest', '~> 1.2'
-  s.add_development_dependency 'factory_bot'
-  s.add_development_dependency 'ffaker', '~> 2.5'
-  s.add_development_dependency 'pry', '~> 0.1'
-  s.add_development_dependency 'rubocop', '~> 0.47'
+  s.add_development_dependency 'factory_bot', '~> 4.8'
+  s.add_development_dependency 'ffaker', '~> 2.7'
+  s.add_development_dependency 'pry', '~> 0.11'
+  s.add_development_dependency 'rubocop', '~> 0.51'
 end
