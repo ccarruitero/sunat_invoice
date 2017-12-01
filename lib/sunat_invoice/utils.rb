@@ -21,5 +21,9 @@ module SunatInvoice
         xml['ext'].ExtensionContent(&block)
       end
     end
+
+    def amount_xml(xml, tag, price, currency)
+      xml.send(tag, price, currencyID: currency)
+    end
   end
 end

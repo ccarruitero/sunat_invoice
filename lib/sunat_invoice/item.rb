@@ -45,25 +45,28 @@ module SunatInvoice
       taxes.map(&:amount).sum
     end
 
-    def xml(xml, index)
+    def xml(xml, index, currency)
       xml['cac'].InvoiceLine do
-        xml['cac'].Item do
-          xml['cbc'].Description @description
-        end
-        xml['cbc'].InvoicedQuantity @quantity
-        # TODO: add attributes
+        build_item(xml)
+        xml['cbc'].InvoicedQuantity(@quantity, unitCode: unit_code)
         xml['cac'].Price do
-          xml['cbc'].PriceAmount @price
+          amount_xml(xml['cbc'], 'PriceAmount', price, currency)
         end
         xml['cac'].PricingReference do
           xml['cac'].AlternativeConditionPrice do
-            xml['cbc'].PriceAmount sale_price
-            xml['cbc'].PriceTypeCode @price_code
+            amount_xml(xml['cbc'], 'PriceAmount', sale_price, currency)
+            xml['cbc'].PriceTypeCode price_code
           end
         end
-        xml['cbc'].LineExtensionAmount bi_value
+        amount_xml(xml['cbc'], 'LineExtensionAmount', bi_value, currency)
         xml['cbc'].ID(index + 1)
         taxes_xml(xml)
+      end
+    end
+
+    def build_item(xml)
+      xml['cac'].Item do
+        xml['cbc'].Description description
       end
     end
 

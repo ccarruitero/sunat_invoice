@@ -22,7 +22,7 @@ module SunatInvoice
       @document_number = opts[:document_number] || 'F001-1'
       @items = []
       @signature = SunatInvoice::Signature.new(provider: @provider)
-      @currency = 'PEN'
+      @currency = opts[:currency] || 'PEN'
     end
 
     def xml
@@ -90,7 +90,7 @@ module SunatInvoice
 
     def build_items(xml)
       items.each_with_index do |item, index|
-        item.xml(xml, index)
+        item.xml(xml, index, @currency)
       end
     end
 

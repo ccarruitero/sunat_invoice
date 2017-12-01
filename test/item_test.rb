@@ -4,7 +4,8 @@ include SunatInvoice
 
 setup do
   @item = SunatInvoice::Item.new(quantity: 200, price: 69, price_code: '01',
-                                 description: 'item description')
+                                 description: 'item description',
+                                 unit_code: 'NIU')
   @item.taxes << SunatInvoice::Tax.new(amount: 12.42, tax_type: :igv)
   invoice_setup
 end
@@ -26,7 +27,11 @@ test 'has unit code and quantity' do
   quantity = @item_xml.xpath('//cbc:InvoicedQuantity')
   assert quantity.count.positive?
   assert_equal @item.quantity.to_s, quantity.first.content
+
   # /Invoice/cac:InvoiceLine/cbc:InvoicedQuantity/@unitCode
+  attributes = quantity.first.attributes
+  assert_equal attributes.keys, ['unitCode']
+  assert_equal attributes['unitCode'].value, @item.unit_code
 end
 
 test 'has a description' do
@@ -38,6 +43,8 @@ test 'has unit prices' do
   price = @item_xml.xpath('//cac:Price/cbc:PriceAmount')
   assert_equal @item.price.to_s, price.first.content
   # /Invoice/cac:InvoiceLine/cac:Price/cbc:PriceAmount/@currencyID
+  assert_equal price.first.attributes.keys, ['currencyID']
+  assert_equal price.first.attributes['currencyID'].value, 'PEN'
 
   ref_pricing = @item_xml.xpath('//cac:PricingReference')
   alt_condition_price = ref_pricing.xpath('//cac:AlternativeConditionPrice')
