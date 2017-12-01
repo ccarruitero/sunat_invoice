@@ -35,7 +35,7 @@ module SunatInvoice
 
           @signature.signer_data(xml)
           xml['ext'].UBLExtensions do
-            @signature.signature_ext(xml)
+            @signature.placeholder(xml)
             build_sale_totals(xml)
           end
           @provider.info(xml)
@@ -45,7 +45,8 @@ module SunatInvoice
           build_total(xml)
         end
       end
-      build.to_xml
+      invoice_xml = build.to_xml
+      @signature.sign(invoice_xml)
     end
 
     def prepare_totals

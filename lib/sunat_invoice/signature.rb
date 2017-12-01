@@ -32,16 +32,29 @@ module SunatInvoice
       end
     end
 
-    def signature_ext(xml)
-      ubl_ext(xml) do
-        xml['ds'].Signature(Id: provider.signature_id) do
-          signed_info xml
-          signature_value xml
-        end
+    def placeholder(xml)
+      # element for store signature
+      ubl_ext(xml)
+    end
+
+    def sign(invoice_xml)
+      doc = Nokogiri::XML(invoice_xml)
+      ext_tag = '//ext:ExtensionContent[not(node())]'
+
+      Nokogiri::XML::Builder.with(doc.at(ext_tag)) do |xml|
+        signature_ext(xml, invoice_xml)
+      end
+      doc.to_xml
+    end
+
+    def signature_ext(xml, invoice_xml)
+      xml['ds'].Signature(Id: provider.signature_id) do
+        signed_info xml, invoice_xml
+        signature_value xml
       end
     end
 
-    def signed_info(xml)
+    def signed_info(xml, invoice_xml)
       xml['ds'].SignedInfo do
         xml['ds'].CanonicalizationMethod Algorithm: C14N_ALGORITHM
         xml['ds'].SignatureMethod Algorithm: SIGNATURE_ALGORITHM
@@ -50,7 +63,7 @@ module SunatInvoice
           xml['ds'].Transform Algorithm: TRANSFORMATION_ALGORITHM
         end
         xml['ds'].DigestMethod(Algorithm: DIGEST_ALGORITHM)
-        xml['ds'].DigestValue provider.signature_digest
+        xml['ds'].DigestValue digest(invoice_xml)
       end
     end
 
@@ -61,6 +74,10 @@ module SunatInvoice
           xml['ds'].X509Certificate provider.certificate
         end
       end
+    end
+
+    def digest(text)
+      OpenSSL::Digest::SHA1.new.base64digest(text)
     end
   end
 end

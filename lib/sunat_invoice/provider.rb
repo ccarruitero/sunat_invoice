@@ -8,9 +8,6 @@ module SunatInvoice
 
     attr_accessor :signature, :signature_id, :certificate, :uri
 
-    def signature_digest
-    end
-
     def address(xml)
       xml['cbc'].ID @ubigeo
       xml['cbc'].StreetName @street
