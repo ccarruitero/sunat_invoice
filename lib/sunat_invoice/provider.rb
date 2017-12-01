@@ -13,25 +13,37 @@ module SunatInvoice
       xml['cbc'].StreetName @street
       xml['cbc'].CitySubdivisionName @zone
       xml['cbc'].CityName @province
-      xml['cbc'].CountrySubentity @departament
+      xml['cbc'].CountrySubentity @department
       xml['cbc'].District @district
+      build_country(xml)
+    end
+
+    def build_country(xml)
       xml['cac'].Country do
-        xml['cbc'].IdentificationCode @country_code
+        xml['cbc'].IdentificationCode country_code
+      end
+    end
+
+    def build_name(xml)
+      xml['cac'].PartyName do
+        xml['cbc'].Name name
+      end
+    end
+
+    def build_registration_name(xml)
+      xml['cac'].PartyLegalEntity do
+        xml['cbc'].RegistrationName name
       end
     end
 
     def info(xml)
       xml['cac'].AccountingSupplierParty do
-        xml['cbc'].CustomerAssignedAccountID @ruc
-        xml['cbc'].AdditionalAccountID @document_type
+        xml['cbc'].CustomerAssignedAccountID ruc
+        xml['cbc'].AdditionalAccountID document_type
         xml['cac'].Party do
-          xml['cac'].PartyName do
-            xml['cbc'].Name @name
-          end
+          build_name(xml)
           xml['cac'].PostalAddress { address(xml) }
-          xml['cac'].PartyLegalEntity do
-            xml['cbc'].RegistrationName @name
-          end
+          build_registration_name(xml)
         end
       end
     end
