@@ -68,8 +68,8 @@ module SunatInvoice
     end
 
     def signature_value(xml)
-      info = xml.at('//ds:SignedInfo')
-      info_canonicalized = canonicalize(info).to_s
+      info = xml.doc.at('//ds:SignedInfo')
+      info_canonicalized = canonicalize(info)
       xml['ds'].SignatureValue sign_info(info_canonicalized)
       xml['ds'].KeyInfo do
         xml['ds'].X509Data do
