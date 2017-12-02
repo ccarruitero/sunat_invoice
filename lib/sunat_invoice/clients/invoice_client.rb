@@ -26,7 +26,7 @@ module SunatInvoice
     end
 
     def send_invoice(invoice, name)
-      zip = prepare_zip(invoice, name)
+      zip = prepare_zip(invoice, "#{name}.xml")
       @soap_client.call(:send_bill,
                         message: { fileName: "#{name}.zip", contentFile: zip })
     end

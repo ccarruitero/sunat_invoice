@@ -29,6 +29,7 @@ module SunatInvoice
     def savon_client
       Savon.client(wsdl: wsdl,
                    wsse_auth: authentication,
+                   namespace: 'http://service.sunat.gob.pe',
                    ssl_cert_file: cert_file,
                    log: log,
                    ssl_cert_key_file: pk_file)
