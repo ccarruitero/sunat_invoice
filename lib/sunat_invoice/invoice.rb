@@ -94,6 +94,10 @@ module SunatInvoice
       end
     end
 
+    def document_name
+      "#{@provider.ruc}-#{document_type}-#{document_number}"
+    end
+
     def build_tax_totals(xml)
       @tax_totals.each do |key, value|
         SunatInvoice::Tax.new(tax_type: key, amount: value).xml(xml, @currency)
