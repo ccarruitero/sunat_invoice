@@ -26,7 +26,7 @@ module SunatInvoice
         end
         xml['cac'].DigitalSignatureAttachment do
           xml['cac'].ExternalReference do
-            xml['cbc'].URI "##{provider.uri}"
+            xml['cbc'].URI "##{provider.signature_location_id}"
           end
         end
       end
@@ -48,7 +48,7 @@ module SunatInvoice
     end
 
     def signature_ext(xml, invoice_xml)
-      xml['ds'].Signature(Id: provider.signature_id) do
+      xml['ds'].Signature(Id: provider.signature_location_id) do
         signed_info xml, invoice_xml
         signature_value xml
       end
