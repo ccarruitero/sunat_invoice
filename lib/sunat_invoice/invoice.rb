@@ -12,6 +12,9 @@ module SunatInvoice
 
     attr_accessor :document_type, :document_number, :items
 
+    UBL_VERSION = '2.0'
+    CUSTOMIZATION = '1.0'
+
     def initialize(*args)
       super(*args)
       opts = args[0] || {}
@@ -30,21 +33,24 @@ module SunatInvoice
 
       build = Nokogiri::XML::Builder.new do |xml|
         xml.Invoice(UBL_NAMESPACES) do
+          xml['ext'].UBLExtensions do
+            build_sale_totals(xml)
+            @signature.placeholder(xml)
+          end
+
+          xml['cbc'].UBLVersionID UBL_VERSION
+          xml['cbc'].CustomizationID CUSTOMIZATION
+          xml['cbc'].ID @document_number
           xml['cbc'].IssueDate @date
           xml['cbc'].InvoiceTypeCode @document_type
-          xml['cbc'].ID @document_number
           xml['cbc'].DocumentCurrencyCode @currency
 
           @signature.signer_data(xml)
-          xml['ext'].UBLExtensions do
-            @signature.placeholder(xml)
-            build_sale_totals(xml)
-          end
           @provider.info(xml)
           @customer.info(xml)
-          build_items(xml)
           build_tax_totals(xml)
           build_total(xml)
+          build_items(xml)
         end
       end
       invoice_xml = build.to_xml
