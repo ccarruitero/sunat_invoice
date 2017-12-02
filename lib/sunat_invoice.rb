@@ -7,6 +7,7 @@ require 'sunat_invoice/item'
 require 'sunat_invoice/tax'
 require 'sunat_invoice/configuration'
 require 'sunat_invoice/client'
+require 'sunat_invoice/clients/invoice_client'
 
 module SunatInvoice
   class << self
