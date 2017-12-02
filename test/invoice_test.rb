@@ -95,8 +95,7 @@ end
 
 test 'has a correlative' do
   tags = @parsed_xml.xpath('//cbc:ID')
-  correlative = tags.first
-  assert_equal correlative.parent.name, 'Invoice'
+  correlative = tags.select { |tax| tax.parent.name == 'Invoice' }.first
   assert_equal correlative.content, @invoice.document_number
 end
 
