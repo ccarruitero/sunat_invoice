@@ -47,20 +47,20 @@ module SunatInvoice
 
     def xml(xml, index, currency)
       xml['cac'].InvoiceLine do
-        build_item(xml)
+        xml['cbc'].ID(index + 1)
         xml['cbc'].InvoicedQuantity(@quantity, unitCode: unit_code)
-        xml['cac'].Price do
-          amount_xml(xml['cbc'], 'PriceAmount', price, currency)
-        end
+        amount_xml(xml['cbc'], 'LineExtensionAmount', bi_value, currency)
         xml['cac'].PricingReference do
           xml['cac'].AlternativeConditionPrice do
             amount_xml(xml['cbc'], 'PriceAmount', sale_price, currency)
             xml['cbc'].PriceTypeCode price_code
           end
         end
-        amount_xml(xml['cbc'], 'LineExtensionAmount', bi_value, currency)
-        xml['cbc'].ID(index + 1)
         taxes_xml(xml, currency)
+        build_item(xml)
+        xml['cac'].Price do
+          amount_xml(xml['cbc'], 'PriceAmount', price, currency)
+        end
       end
     end
 
