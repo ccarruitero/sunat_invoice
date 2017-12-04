@@ -6,6 +6,7 @@ require 'sunat_invoice/customer'
 require 'sunat_invoice/item'
 require 'sunat_invoice/tax'
 require 'sunat_invoice/configuration'
+require 'sunat_invoice/response_parser'
 require 'sunat_invoice/client'
 require 'sunat_invoice/clients/invoice_client'
 
