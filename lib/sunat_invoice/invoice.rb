@@ -125,7 +125,7 @@ module SunatInvoice
 
     def build_total(xml)
       xml['cac'].LegalMonetaryTotal do
-        xml['cbc'].PayableAmount @total
+        amount_xml(xml['cbc'], 'PayableAmount', @total, @currency)
       end
     end
 
