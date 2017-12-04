@@ -8,6 +8,10 @@ FactoryBot.define do
 
   factory :item, class: 'SunatInvoice::Item' do
     quantity 10
+    unit_code 'NIU'
+    price 20
+    price_code '01'
+    description 'Grabadora Externo'
   end
 
   factory :invoice, class: 'SunatInvoice::Invoice' do
