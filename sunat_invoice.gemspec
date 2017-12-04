@@ -12,9 +12,9 @@ Gem::Specification.new do |s|
 
   s.files = `git ls-files`.split("\n")
 
-  s.add_dependency 'savon', '~> 2.11.2'
   s.add_dependency 'nokogiri', '~> 1.8'
-  s.add_dependency 'rubyzip', '~> 1.2.1'
+  s.add_dependency 'rubyzip', '~> 1.2'
+  s.add_dependency 'savon', '~> 2.11'
   s.add_dependency 'xmldsig', '~> 0.6.5'
 
   s.add_development_dependency 'cutest', '~> 1.2'

@@ -41,7 +41,7 @@ module SunatInvoice
 
     def tax_category(xml)
       xml['cac'].TaxCategory do
-        xml['cbc'].TaxExemptionReasonCode(tax_exemption_reason) if tax_exemption_reason
+        tax_exemption(xml)
         xml['cbc'].TierRange(tier_range) if tier_range
         tax_scheme(xml)
       end
@@ -57,6 +57,11 @@ module SunatInvoice
 
     def tax_data(attribute)
       TAXES[tax_type][attribute]
+    end
+
+    def tax_exemption(xml)
+      return unless tax_exemption_reason
+      xml['cbc'].TaxExemptionReasonCode(tax_exemption_reason)
     end
   end
 end

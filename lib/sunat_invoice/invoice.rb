@@ -1,4 +1,5 @@
 # frozen_string_literal: false
+
 require_relative 'utils'
 require_relative 'provider'
 require_relative 'customer'
@@ -12,15 +13,18 @@ module SunatInvoice
 
     attr_accessor :document_type, :document_number, :items
 
-    UBL_VERSION = '2.0'
-    CUSTOMIZATION = '1.0'
+    UBL_VERSION = '2.0'.freeze
+    CUSTOMIZATION = '1.0'.freeze
 
     def initialize(*args)
       super(*args)
       opts = args[0] || {}
-      @provider = opts[:provider] || SunatInvoice::Provider.new
-      @customer = opts[:customer] || SunatInvoice::Customer.new
-      @date = opts[:date] || DateTime.now.strftime('%Y-%m-%d')
+      init_defaults(opts)
+    end
+
+    def init_defaults(opts)
+      parties_default(opts)
+      @date = opts[:date] || Date.today.strftime('%Y-%m-%d')
       @document_type = opts[:document_type] || '01'
       @document_number = opts[:document_number] || 'F001-1'
       @currency = opts[:currency] || 'PEN'
@@ -28,23 +32,18 @@ module SunatInvoice
       @signature = SunatInvoice::Signature.new(provider: @provider)
     end
 
+    def parties_default(opts)
+      @provider = opts[:provider] || SunatInvoice::Provider.new
+      @customer = opts[:customer] || SunatInvoice::Customer.new
+    end
+
     def xml
       prepare_totals
 
       build = Nokogiri::XML::Builder.new do |xml|
         xml.Invoice(UBL_NAMESPACES) do
-          xml['ext'].UBLExtensions do
-            build_sale_totals(xml)
-            @signature.signature_ext(xml)
-          end
-
-          xml['cbc'].UBLVersionID UBL_VERSION
-          xml['cbc'].CustomizationID CUSTOMIZATION
-          xml['cbc'].ID @document_number
-          xml['cbc'].IssueDate @date
-          xml['cbc'].InvoiceTypeCode @document_type
-          xml['cbc'].DocumentCurrencyCode @currency
-
+          build_ext(xml)
+          build_invoice_data(xml)
           @signature.signer_data(xml)
           @provider.info(xml)
           @customer.info(xml)
@@ -94,6 +93,22 @@ module SunatInvoice
       end
     end
 
+    def build_ext(xml)
+      xml['ext'].UBLExtensions do
+        build_sale_totals(xml)
+        @signature.signature_ext(xml)
+      end
+    end
+
+    def build_invoice_data(xml)
+      xml['cbc'].UBLVersionID UBL_VERSION
+      xml['cbc'].CustomizationID CUSTOMIZATION
+      xml['cbc'].ID @document_number
+      xml['cbc'].IssueDate @date
+      xml['cbc'].InvoiceTypeCode @document_type
+      xml['cbc'].DocumentCurrencyCode @currency
+    end
+
     def build_items(xml)
       items.each_with_index do |item, index|
         item.xml(xml, index, @currency)
@@ -136,10 +151,9 @@ module SunatInvoice
     def get_total_code(tax)
       return unless tax
       case tax.tax_type
+      # TODO: :isc
       when :igv
         get_total_igv_code(tax.tax_exemption_reason)
-      # when :isc
-      #   tax.tier_range
       end
     end
 
@@ -153,19 +167,6 @@ module SunatInvoice
       elsif Catalogs::CATALOG_07[8..14].include?(exemption_reason)
         Catalogs::CATALOG_14[1]
       end
-    end
-
-    def attributes
-      {
-        attributes!: {
-          'cbc:InvoicedQuantity' => { '@unitCode' => :unit },
-          'cbc:PriceAmount' => { '@currencyID' => :currency }, # PEN
-          'cbc:TaxAmount' => { '@currencyID' => :currency }, # PEN
-          'cbc:PayableAmount' => { '@currencyID' => :currency }, # PEN
-          'cbc:LineExtensionAmount' => { '@currencyID' => :currency }, # PEN
-          'cbc:ChargeTotalAmount' => { '@currencyID' => :currency }, # PEN
-        }
-      }
     end
   end
 end

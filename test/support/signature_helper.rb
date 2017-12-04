@@ -1,7 +1,20 @@
+# frozen_string_literal: true
+
 module SignatureHelper
   def self.generate_keys
+    return if exists?('pk_file')
+
     pk = OpenSSL::PKey::RSA.new 2048
-    name = OpenSSL::X509::Name.parse("CN=example.com/C=EE")
+    cert = generate_certificate(pk)
+
+    cert_dir = "#{File.dirname(__FILE__)}/../certs"
+    Dir.mkdir(cert_dir) unless Dir.exist?(cert_dir)
+    File.open(file('pk_file'), 'w') { |f| f.puts pk.to_pem }
+    File.open(file('cert_file'), 'w') { |f| f.puts cert.to_pem }
+  end
+
+  def self.generate_certificate(pk)
+    name = OpenSSL::X509::Name.parse('CN=example.com/C=EE')
     cert = OpenSSL::X509::Certificate.new
     cert.version    = 2
     cert.serial     = 0
@@ -11,13 +24,7 @@ module SignatureHelper
     cert.subject    = name
     cert.issuer     = name
     cert.sign pk, OpenSSL::Digest::SHA1.new
-
-    unless exists?('pk_file')
-      cert_dir = "#{File.dirname(__FILE__)}/../certs"
-      Dir.mkdir(cert_dir) unless Dir.exist?(cert_dir)
-      File.open(file('pk_file'), 'w') { |f| f.puts pk.to_pem  }
-      File.open(file('cert_file'), 'w') { |f| f.puts cert.to_pem  }
-    end
+    cert
   end
 
   def self.file(name)
@@ -25,6 +32,6 @@ module SignatureHelper
   end
 
   def self.exists?(name)
-    File.exists?(file(name))
+    File.exist?(file(name))
   end
 end

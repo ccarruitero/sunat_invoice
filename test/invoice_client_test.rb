@@ -5,14 +5,14 @@ require_relative 'helper'
 scope 'SunatInvoice::InvoiceClient' do
   setup do
     provider = FactoryBot.build(:provider,
-                                  signature_id: 'signatureST',
-                                  signature_location_id: 'signQWI3',
-                                  ruc: '20100454523',
-                                  name: 'SOPORTE TECNOLOGICO EIRL')
+                                signature_id: 'signatureST',
+                                signature_location_id: 'signQWI3',
+                                ruc: '20100454523',
+                                name: 'SOPORTE TECNOLOGICO EIRL')
 
     customer = FactoryBot.build(:customer,
-                                  ruc: '20293028401',
-                                  name: 'SOME BUSINESS')
+                                ruc: '20293028401',
+                                name: 'SOME BUSINESS')
     SunatInvoice.configure do |c|
       c.account_ruc = provider.ruc
       c.account_user = 'MODDATOS'
@@ -32,7 +32,6 @@ scope 'SunatInvoice::InvoiceClient' do
   test 'should use dev service when not define environment' do
     assert_equal @client.wsdl, @client.dev_server
   end
-
 
   test '#send_invoice success' do
     response = @client.send_invoice(@invoice.xml, @invoice.document_name)

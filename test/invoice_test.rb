@@ -1,4 +1,5 @@
 # frozen_string_literal: false
+
 require_relative 'helper'
 include SunatInvoice
 
@@ -27,7 +28,7 @@ end
 
 test 'has a date' do
   date = @parsed_xml.xpath('//cbc:IssueDate')
-  assert_equal date.first.content, DateTime.now.strftime('%Y-%m-%d')
+  assert_equal date.first.content, Date.today.strftime('%Y-%m-%d')
 end
 
 test 'has a signature' do
@@ -110,7 +111,7 @@ test 'has at least one item' do
 end
 
 test 'has total by kind of sale' do
-  tag = '//ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sac:AdditionalInformation'
+  tag = '//ext:UBLExtension/ext:ExtensionContent/sac:AdditionalInformation'
   additional_info = @parsed_xml.xpath(tag)
   assert additional_info.count.positive?
   assert_equal additional_info.first.children.count, 1

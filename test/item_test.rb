@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require_relative 'helper'
 include SunatInvoice
 
@@ -104,7 +105,7 @@ scope '#sale_taxes' do
   test 'has sum by tax_type' do
     @item.taxes << SunatInvoice::Tax.new(amount: 5, tax_type: :isc)
     assert_equal @item.sale_taxes.count, 2
-    assert_equal @item.sale_taxes.keys, [:igv, :isc]
+    assert_equal @item.sale_taxes.keys, %i[igv isc]
     assert_equal @item.sale_taxes.values, [21.6, 10]
   end
 end

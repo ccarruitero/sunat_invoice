@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require_relative 'utils'
 
 module SunatInvoice
@@ -50,23 +51,31 @@ module SunatInvoice
         xml['cbc'].ID(index + 1)
         xml['cbc'].InvoicedQuantity(@quantity, unitCode: unit_code)
         amount_xml(xml['cbc'], 'LineExtensionAmount', bi_value, currency)
-        xml['cac'].PricingReference do
-          xml['cac'].AlternativeConditionPrice do
-            amount_xml(xml['cbc'], 'PriceAmount', sale_price, currency)
-            xml['cbc'].PriceTypeCode price_code
-          end
-        end
+        build_pricing_reference(xml, currency)
         taxes_xml(xml, currency)
         build_item(xml)
-        xml['cac'].Price do
-          amount_xml(xml['cbc'], 'PriceAmount', price, currency)
-        end
+        build_price(xml, currency)
       end
     end
 
     def build_item(xml)
       xml['cac'].Item do
         xml['cbc'].Description description
+      end
+    end
+
+    def build_pricing_reference(xml, currency)
+      xml['cac'].PricingReference do
+        xml['cac'].AlternativeConditionPrice do
+          amount_xml(xml['cbc'], 'PriceAmount', sale_price, currency)
+          xml['cbc'].PriceTypeCode price_code
+        end
+      end
+    end
+
+    def build_price(xml, currency)
+      xml['cac'].Price do
+        amount_xml(xml['cbc'], 'PriceAmount', price, currency)
       end
     end
 

@@ -18,24 +18,34 @@ module SunatInvoice
     def signer_data(xml)
       xml['cac'].Signature do
         xml['cbc'].ID provider.signature_id
-        xml['cac'].SignatoryParty do
-          xml['cac'].PartyIdentification do
-            xml['cbc'].ID provider.ruc
-          end
-          xml['cac'].PartyName do
-            xml['cbc'].Name provider.name
-          end
+        build_signatory_party(xml)
+        build_digital_attachment(xml)
+      end
+    end
+
+    def build_signatory_party(xml)
+      xml['cac'].SignatoryParty do
+        xml['cac'].PartyIdentification do
+          xml['cbc'].ID provider.ruc
         end
-        xml['cac'].DigitalSignatureAttachment do
-          xml['cac'].ExternalReference do
-            xml['cbc'].URI "##{provider.signature_location_id}"
-          end
+        xml['cac'].PartyName do
+          xml['cbc'].Name provider.name
+        end
+      end
+    end
+
+    def build_digital_attachment(xml)
+      xml['cac'].DigitalSignatureAttachment do
+        xml['cac'].ExternalReference do
+          xml['cbc'].URI "##{provider.signature_location_id}"
         end
       end
     end
 
     def sign(invoice_xml)
-      Xmldsig::SignedDocument.new(invoice_xml, id_attr: provider.signature_location_id).sign(private_key)
+      options = { id_attr: provider.signature_location_id }
+      doc = Xmldsig::SignedDocument.new(invoice_xml, options)
+      doc.sign(private_key)
     end
 
     def signature_ext(xml)
@@ -52,12 +62,16 @@ module SunatInvoice
         xml['ds'].CanonicalizationMethod Algorithm: C14N_ALGORITHM
         xml['ds'].SignatureMethod Algorithm: SIGNATURE_ALGORITHM
         xml['ds'].Reference URI: '' do
-          xml['ds'].Transforms do
-            xml['ds'].Transform Algorithm: TRANSFORMATION_ALGORITHM
-          end
+          build_transforms(xml)
           xml['ds'].DigestMethod Algorithm: DIGEST_ALGORITHM
           xml['ds'].DigestValue
         end
+      end
+    end
+
+    def build_transforms(xml)
+      xml['ds'].Transforms do
+        xml['ds'].Transform Algorithm: TRANSFORMATION_ALGORITHM
       end
     end
 
