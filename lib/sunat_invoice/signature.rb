@@ -65,12 +65,16 @@ module SunatInvoice
       xml['ds'].SignatureValue
       xml['ds'].KeyInfo do
         xml['ds'].X509Data do
-          xml['ds'].X509Certificate certificate
+          xml['ds'].X509Certificate encoded_certificate
         end
       end
     end
 
     private
+
+    def encoded_certificate
+      Base64.encode64(certificate.to_der).gsub(/\n/, '')
+    end
 
     def private_key
       OpenSSL::PKey::RSA.new(File.read(provider.pk_file))
