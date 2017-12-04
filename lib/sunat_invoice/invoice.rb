@@ -24,7 +24,7 @@ module SunatInvoice
       @document_type = opts[:document_type] || '01'
       @document_number = opts[:document_number] || 'F001-1'
       @currency = opts[:currency] || 'PEN'
-      @items = []
+      @items ||= []
       @signature = SunatInvoice::Signature.new(provider: @provider)
     end
 
@@ -35,7 +35,7 @@ module SunatInvoice
         xml.Invoice(UBL_NAMESPACES) do
           xml['ext'].UBLExtensions do
             build_sale_totals(xml)
-            @signature.placeholder(xml)
+            @signature.signature_ext(xml)
           end
 
           xml['cbc'].UBLVersionID UBL_VERSION
