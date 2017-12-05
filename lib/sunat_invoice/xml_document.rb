@@ -7,6 +7,8 @@ module SunatInvoice
   class XmlDocument < Model
     include Utils
 
+    attr_accessor :document_type, :date, :items
+
     UBL_VERSION = '2.0'.freeze
     CUSTOMIZATION = '1.0'.freeze
 
@@ -26,6 +28,14 @@ module SunatInvoice
         yield(xml)
         @signature.signature_ext(xml)
       end
+    end
+
+    def build_number(xml)
+      xml['cbc'].ID document_number
+    end
+
+    def formated_date(date)
+      date.strftime('%Y-%m-%d')
     end
   end
 end
