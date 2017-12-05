@@ -7,7 +7,7 @@ module SunatInvoice
   class XmlDocument < Model
     include Utils
 
-    attr_accessor :document_type, :date, :items
+    attr_accessor :document_type, :date, :provider, :signature, :currency
 
     UBL_VERSION = '2.0'.freeze
     CUSTOMIZATION = '1.0'.freeze
