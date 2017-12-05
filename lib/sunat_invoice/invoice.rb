@@ -35,7 +35,6 @@ module SunatInvoice
       prepare_totals
 
       build = build_xml('Invoice') do |xml|
-        build_ext(xml)
         build_invoice_data(xml)
         @signature.signer_data(xml)
         @provider.info(xml)
@@ -87,15 +86,12 @@ module SunatInvoice
     end
 
     def build_ext(xml)
-      xml['ext'].UBLExtensions do
-        build_sale_totals(xml)
-        @signature.signature_ext(xml)
+      super(xml) do |xml_|
+        build_sale_totals(xml_)
       end
     end
 
     def build_invoice_data(xml)
-      xml['cbc'].UBLVersionID UBL_VERSION
-      xml['cbc'].CustomizationID CUSTOMIZATION
       xml['cbc'].ID @document_number
       xml['cbc'].IssueDate @date
       xml['cbc'].InvoiceTypeCode @document_type
