@@ -18,7 +18,6 @@ module SunatInvoice
 
     def init_defaults(opts)
       parties_default(opts)
-      @date ||= Date.today
       @document_type = opts[:document_type] || '01'
       @document_number = opts[:document_number] || 'F001-1'
       @currency = opts[:currency] || 'PEN'

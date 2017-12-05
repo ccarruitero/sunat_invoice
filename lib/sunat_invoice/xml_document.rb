@@ -12,6 +12,11 @@ module SunatInvoice
     UBL_VERSION = '2.0'.freeze
     CUSTOMIZATION = '1.0'.freeze
 
+    def initialize(*args)
+      super(args)
+      @date ||= Date.today
+    end
+
     def build_xml(root)
       Nokogiri::XML::Builder.new do |xml|
         xml.send(root, UBL_NAMESPACES) do
