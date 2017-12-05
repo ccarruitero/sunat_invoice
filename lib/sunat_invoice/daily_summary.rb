@@ -10,9 +10,9 @@ module SunatInvoice
         build_summary_info(xml)
         @signature.signer_data(xml)
         @provider.info(xml)
+        build_lines_xml(xml)
       end
       @signature.sign(build.to_xml)
-      build_lines_xml(xml)
     end
 
     private
@@ -28,7 +28,7 @@ module SunatInvoice
     end
 
     def build_lines_xml(xml)
-      lines.each_with_index do |line, index|
+      lines&.each_with_index do |line, index|
         line.xml(xml, index, currency)
       end
     end

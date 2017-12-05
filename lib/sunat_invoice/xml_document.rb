@@ -13,24 +13,24 @@ module SunatInvoice
     CUSTOMIZATION = '1.0'.freeze
 
     def initialize(*args)
-      super(args)
+      super(*args)
       @date ||= Date.today
     end
 
-    def build_xml(root)
+    def build_xml(root, &block)
       Nokogiri::XML::Builder.new do |xml|
         xml.send(root, UBL_NAMESPACES) do
           build_ext(xml)
           xml['cbc'].UBLVersionID UBL_VERSION
           xml['cbc'].CustomizationID CUSTOMIZATION
-          yield(xml)
+          yield(xml) if block
         end
       end
     end
 
-    def build_ext(xml)
+    def build_ext(xml, &block)
       xml['ext'].UBLExtensions do
-        yield(xml)
+        yield(xml) if block
         @signature.signature_ext(xml)
       end
     end

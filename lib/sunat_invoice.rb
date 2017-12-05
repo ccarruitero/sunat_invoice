@@ -10,6 +10,8 @@ require 'sunat_invoice/configuration'
 require 'sunat_invoice/response_parser'
 require 'sunat_invoice/client'
 require 'sunat_invoice/clients/invoice_client'
+require 'sunat_invoice/daily_summary'
+require 'sunat_invoice/summary_line'
 
 module SunatInvoice
   class << self

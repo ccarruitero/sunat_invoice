@@ -1,19 +1,15 @@
 # frozen_string_literal: true
 
-require 'model'
-require 'utils'
+require_relative 'model'
+require_relative 'utils'
 
 module SunatInvoice
   class SummaryLine < Model
+    include Utils
+
     attr_accessor :document_type, :document_serial, :start_document_number,
                   :end_document_number, :total_amount, :taxes, :taxable,
                   :non_taxable, :exempt, :other_charge, :charge_type
-
-    PAYMENTS = [
-      { amount: :taxable, code: '01' },
-      { amount: :non_taxable, code: '02' },
-      { amount: :exempt, code: '03' }
-    ].freeze
 
     CHARGES = {
       discount: false,
@@ -21,7 +17,7 @@ module SunatInvoice
     }.freeze
 
     def initialize(*args)
-      super(args)
+      super(*args)
       @taxable ||= 0
       @non_taxable ||= 0
       @exempt ||= 0
@@ -44,6 +40,12 @@ module SunatInvoice
 
     private
 
+    def payments
+      [{ amount: taxable, code: '01' },
+       { amount: exempt, code: '02' },
+       { amount: non_taxable, code: '03' }]
+    end
+
     def build_documents_info(xml)
       xml['cbc'].DocumentTypeCode document_type
       xml['sac'].DocumentSerialID document_serial
@@ -57,10 +59,10 @@ module SunatInvoice
     end
 
     def build_payments(xml, currency)
-      PAYMENTS.each do |payment|
+      payments.each do |payment|
         xml['sac'].BillingPayment do
-          amount_xml(xml['cbc'], 'PaidAmount', payment.amount, currency)
-          xml['cbc'].InstructionID payment.code
+          amount_xml(xml['cbc'], 'PaidAmount', payment[:amount], currency)
+          xml['cbc'].InstructionID payment[:code]
         end
       end
     end

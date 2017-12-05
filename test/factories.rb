@@ -21,6 +21,11 @@ FactoryBot.define do
     initialize_with { new(attributes) }
   end
 
+  factory :daily_summary, class: 'SunatInvoice::DailySummary' do
+    provider { build(:provider) }
+    signature { build(:signature, provider: provider) }
+  end
+
   factory :provider, class: 'SunatInvoice::Provider' do
     pk_file File.join(File.dirname(__FILE__), 'certs/pk_file')
     cert_file File.join(File.dirname(__FILE__), 'certs/cert_file')
@@ -44,5 +49,9 @@ FactoryBot.define do
     document_type 6
 
     initialize_with { new(attributes) }
+  end
+
+  factory :signature, class: 'SunatInvoice::Signature' do
+    provider { build(:provider) }
   end
 end
