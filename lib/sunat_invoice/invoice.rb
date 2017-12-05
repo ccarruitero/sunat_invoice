@@ -1,6 +1,5 @@
 # frozen_string_literal: false
 
-require_relative 'utils'
 require_relative 'provider'
 require_relative 'customer'
 require_relative 'signature'
@@ -8,13 +7,8 @@ require_relative 'tax'
 require_relative 'catalogs'
 
 module SunatInvoice
-  class Invoice < Model
-    include Utils
-
+  class Invoice < XmlDocument
     attr_accessor :document_type, :document_number, :items
-
-    UBL_VERSION = '2.0'.freeze
-    CUSTOMIZATION = '1.0'.freeze
 
     def initialize(*args)
       super(*args)
@@ -40,18 +34,17 @@ module SunatInvoice
     def xml
       prepare_totals
 
-      build = Nokogiri::XML::Builder.new do |xml|
-        xml.Invoice(UBL_NAMESPACES) do
-          build_ext(xml)
-          build_invoice_data(xml)
-          @signature.signer_data(xml)
-          @provider.info(xml)
-          @customer.info(xml)
-          build_tax_totals(xml)
-          build_total(xml)
-          build_items(xml)
-        end
+      build = build_xml('Invoice') do |xml|
+        build_ext(xml)
+        build_invoice_data(xml)
+        @signature.signer_data(xml)
+        @provider.info(xml)
+        @customer.info(xml)
+        build_tax_totals(xml)
+        build_total(xml)
+        build_items(xml)
       end
+
       invoice_xml = build.to_xml
       @signature.sign(invoice_xml)
     end

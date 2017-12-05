@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'sunat_invoice/xml_document'
 require 'sunat_invoice/invoice'
 require 'sunat_invoice/provider'
 require 'sunat_invoice/customer'
