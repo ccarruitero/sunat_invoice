@@ -61,7 +61,7 @@ FactoryBot.define do
     start_document_number 231
     end_document_number 239
     taxable 2000
-    taxes { [build(:tax, amount: 360)] }
+    taxes { [build(:tax, amount: 360), build(:tax, amount: 0, tax_type: :isc)] }
     total_amount 2360
   end
 end
