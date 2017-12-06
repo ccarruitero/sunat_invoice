@@ -25,9 +25,13 @@ module SunatInvoice
       encode(zip_file.sysread)
     end
 
-    def send_invoice(invoice, name)
-      zip = prepare_zip(invoice, "#{name}.xml")
-      @soap_client.call(:send_bill,
+    def dispatch(document)
+      # * document - Invoice or DailySummary instance
+      xml_build = document.xml
+      name = document.document_name
+      operation = document.operation
+      zip = prepare_zip(xml_build, "#{name}.xml")
+      @soap_client.call(operation,
                         message: { fileName: "#{name}.zip", contentFile: zip })
     end
 

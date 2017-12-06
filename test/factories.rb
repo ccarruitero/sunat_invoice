@@ -54,4 +54,14 @@ FactoryBot.define do
   factory :signature, class: 'SunatInvoice::Signature' do
     provider { build(:provider) }
   end
+
+  factory :summary_line, class: 'SunatInvoice::SummaryLine' do
+    document_type '03'
+    document_serial 'BD56'
+    start_document_number 231
+    end_document_number 239
+    taxable 2000
+    taxes { [build(:tax, amount: 360)] }
+    total_amount 2360
+  end
 end

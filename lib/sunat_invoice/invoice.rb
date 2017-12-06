@@ -16,6 +16,10 @@ module SunatInvoice
       init_defaults(opts)
     end
 
+    def operation
+      :send_bill
+    end
+
     def init_defaults(opts)
       parties_default(opts)
       @document_type = opts[:document_type] || '01'

@@ -15,6 +15,14 @@ module SunatInvoice
       @signature.sign(build.to_xml)
     end
 
+    def operation
+      :send_summary
+    end
+
+    def document_name
+      "#{@provider.ruc}-#{document_number}"
+    end
+
     private
 
     def document_number
