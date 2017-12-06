@@ -22,16 +22,13 @@ module SunatInvoice
       @non_taxable ||= 0
       @exempt ||= 0
       @other_charge ||= 0
-      @total_line = total_amount
     end
 
     def xml(xml, index, currency)
-      calculate_total_amount
-
       xml['sac'].SummaryDocumentsLine do
         xml['cbc'].LineID(index + 1)
         build_documents_info(xml)
-        amount_xml(xml['sac'], 'TotalAmount', @total_line, currency)
+        amount_xml(xml['sac'], 'TotalAmount', total_amount, currency)
         build_payments(xml, currency)
         build_other_charge(xml, currency)
         build_taxes_xml(xml, currency)
