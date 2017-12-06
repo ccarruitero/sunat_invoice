@@ -10,12 +10,17 @@ module SunatInvoice
       98 => 'process with errors'
     }.freeze
 
-    def initialize(body)
+    ALLOWED_PARSERS = ['invoice', 'summary'].freeze
+
+    def initialize(body, parser_type)
       # body: SOAP body as a Hash. Typically Savon Response body.
-      parse(body)
+      # parser_type: kind of parser to use.
+      send("parse_#{parser_type}", body)
     end
 
-    def parse(body)
+    private
+
+    def parse_invoice(body)
       encrypted = body[:send_bill_response][:application_response]
       decoded = Base64.decode64(encrypted)
       Zip::InputStream.open(StringIO.new(decoded)) do |io|
