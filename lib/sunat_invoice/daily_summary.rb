@@ -24,14 +24,14 @@ module SunatInvoice
     end
 
     def document_name
-      "#{@provider.ruc}-#{document_number}-1"
+      "#{@provider.ruc}-#{document_number}"
     end
 
     private
 
     def document_number
       formated = date.strftime('%Y%m%d') #  YYYYMMDD
-      "RC-#{formated}"
+      "RC-#{formated}-1"
     end
 
     def build_summary_info(xml)
