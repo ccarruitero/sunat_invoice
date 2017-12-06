@@ -38,13 +38,13 @@ module SunatInvoice
       end
     end
 
-    def info(xml)
+    def info(xml, with_address = true)
       xml['cac'].AccountingSupplierParty do
         xml['cbc'].CustomerAssignedAccountID ruc
         xml['cbc'].AdditionalAccountID document_type
         xml['cac'].Party do
           build_name(xml)
-          xml['cac'].PostalAddress { address(xml) }
+          xml['cac'].PostalAddress { address(xml) } if with_address
           build_registration_name(xml)
         end
       end

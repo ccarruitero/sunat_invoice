@@ -13,7 +13,7 @@ module SunatInvoice
         build_number(xml)
         build_summary_info(xml)
         @signature.signer_data(xml)
-        @provider.info(xml)
+        @provider.info(xml, false)
         build_lines_xml(xml)
       end
       @signature.sign(build.to_xml)
