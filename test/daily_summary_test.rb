@@ -23,3 +23,13 @@ test 'line total amount has correct content' do
   total = @parsed_xml.at('//sac:SummaryDocumentsLine/sac:TotalAmount').content
   assert_equal total, @line.total_amount.to_s
 end
+
+test 'ChargeIndicator must not be empty when not charge_type' do
+  assert @line.charge_type.nil?
+  assert !@parsed_xml.at('//cbc:ChargeIndicator').content.empty?
+end
+
+test 'AllowanceCharge Amount is 0' do
+  amount = @parsed_xml.at('//cac:AllowanceCharge/cbc:Amount').content
+  assert_equal amount, '0'
+end
