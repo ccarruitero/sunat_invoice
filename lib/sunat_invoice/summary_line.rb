@@ -66,7 +66,7 @@ module SunatInvoice
 
     def build_other_charge(xml, currency)
       xml['cac'].AllowanceCharge do
-        xml['cbc'].ChargeIndicator resolve_charge_type
+        xml['cbc'].ChargeIndicator CHARGES.values.last
         amount_xml(xml['cbc'], 'Amount', other_charge, currency)
       end
     end
