@@ -18,10 +18,10 @@ module SunatInvoice
 
     def initialize(*args)
       super(*args)
-      @taxable ||= 0
-      @non_taxable ||= 0
-      @exempt ||= 0
-      @other_charge ||= 0
+      @taxable ||= 0.01
+      @non_taxable ||= 0.01
+      @exempt ||= 0.01
+      @other_charge ||= 0.01
     end
 
     def xml(xml, index, currency)

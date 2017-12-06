@@ -31,5 +31,5 @@ end
 
 test 'AllowanceCharge Amount is 0' do
   amount = @parsed_xml.at('//cac:AllowanceCharge/cbc:Amount').content
-  assert_equal amount, '0'
+  assert_equal amount, '0.01'
 end
