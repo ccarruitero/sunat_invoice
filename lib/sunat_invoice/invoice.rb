@@ -34,6 +34,10 @@ module SunatInvoice
       @customer = opts[:customer] || SunatInvoice::Customer.new
     end
 
+    def namespaces
+      INVOICE_NAMESPACES
+    end
+
     def xml
       prepare_totals
 

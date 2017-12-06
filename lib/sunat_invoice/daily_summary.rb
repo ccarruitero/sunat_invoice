@@ -4,6 +4,10 @@ module SunatInvoice
   class DailySummary < XmlDocument
     attr_accessor :reference_date, :lines
 
+    def namespaces
+      SUMMARY_NAMESPACES
+    end
+
     def xml
       build = build_xml('SummaryDocuments') do |xml|
         build_number(xml)
@@ -20,7 +24,7 @@ module SunatInvoice
     end
 
     def document_name
-      "#{@provider.ruc}-#{document_number}"
+      "#{@provider.ruc}-#{document_number}-1"
     end
 
     private

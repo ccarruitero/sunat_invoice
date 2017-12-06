@@ -19,7 +19,7 @@ module SunatInvoice
 
     def build_xml(root, &block)
       Nokogiri::XML::Builder.new do |xml|
-        xml.send(root, UBL_NAMESPACES) do
+        xml.send(root, namespaces) do
           build_ext(xml)
           xml['cbc'].UBLVersionID UBL_VERSION
           xml['cbc'].CustomizationID CUSTOMIZATION

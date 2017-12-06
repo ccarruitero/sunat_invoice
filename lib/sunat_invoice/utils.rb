@@ -5,17 +5,37 @@ module SunatInvoice
     @namespace_path = 'urn:oasis:names:specification:ubl:schema:xsd'
     @sunat_namespace_path = 'urn:sunat:names:specification:ubl:peru:schema:xsd'
 
-    UBL_NAMESPACES = {
+    COMMON_NAMESPACES = {
+      cac: "#{@namespace_path}:CommonAggregateComponents-2",
+      cbc: "#{@namespace_path}:CommonBasicComponents-2",
+      ds: 'http://www.w3.org/2000/09/xmldsig#',
+      ext: "#{@namespace_path}:CommonExtensionComponents-2",
+      sac: "#{@sunat_namespace_path}:SunatAggregateComponents-1",
+      xsi: 'http://www.w3.org/2001/XMLSchema-instance'
+    }.freeze
+
+    INVOICE_NAMESPACES = {
       'xmlns' => "#{@namespace_path}:Invoice-2",
-      'xmlns:cac' => "#{@namespace_path}:CommonAggregateComponents-2",
-      'xmlns:cbc' => "#{@namespace_path}:CommonBasicComponents-2",
+      'xmlns:cac' => COMMON_NAMESPACES[:cac],
+      'xmlns:cbc' => COMMON_NAMESPACES[:cbc],
       'xmlns:ccts' => 'urn:un:unece:uncefact:documentation:2',
-      'xmlns:ds' => 'http://www.w3.org/2000/09/xmldsig#',
-      'xmlns:ext' => "#{@namespace_path}:CommonExtensionComponents-2",
+      'xmlns:ds' => COMMON_NAMESPACES[:ds],
+      'xmlns:ext' => COMMON_NAMESPACES[:ext],
       'xmlns:qdt' => "#{@namespace_path}:QualifiedDatatypes-2",
-      'xmlns:sac' => "#{@sunat_namespace_path}:SunatAggregateComponents-1",
+      'xmlns:sac' => COMMON_NAMESPACES[:sac],
       'xmlns:udt' => 'urn:un:unece:uncefact:data:specification:UnqualifiedDataTypesSchemaModule:2',
-      'xmlns:xsi' => 'http://www.w3.org/2001/XMLSchema-instance'
+      'xmlns:xsi' => COMMON_NAMESPACES[:xsi]
+    }.freeze
+
+    SUMMARY_NAMESPACES = {
+      'xmlns' => "#{@sunat_namespace_path}:SummaryDocuments-1",
+      'xmlns:cac' => COMMON_NAMESPACES[:cac],
+      'xmlns:cbc' => COMMON_NAMESPACES[:cbc],
+      'xmlns:ds' => COMMON_NAMESPACES[:ds],
+      'xmlns:ext' => COMMON_NAMESPACES[:ext],
+      'xmlns:sac' => COMMON_NAMESPACES[:sac],
+      'xmlns:xsi' => COMMON_NAMESPACES[:xsi],
+      'xsi:schemaLocation' => 'urn:sunat:names:specification:ubl:peru:schema:xsd:InvoiceSummary-1 D:\UBL_SUNAT\SUNAT_xml_20110112\20110112\xsd\maindoc\UBLPE-InvoiceSummary-1.0.xsd'
     }.freeze
 
     def ubl_ext(xml, &block)
