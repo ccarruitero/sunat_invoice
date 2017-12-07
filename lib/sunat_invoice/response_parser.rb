@@ -2,7 +2,7 @@
 
 module SunatInvoice
   class ResponseParser
-    attr_reader :cdr, :status_code, :document_number, :message
+    attr_reader :cdr, :status_code, :document_number, :message, :ticket
 
     STATUS_CODES = {
       0 => 'process success',
@@ -36,6 +36,10 @@ module SunatInvoice
       @status_code = response_node.at('//cbc:ResponseCode').content
       @document_number = response_node.at('//cbc:ReferenceID').content
       @message = response_node.at('//cbc:Description').content
+    end
+
+    def parse_summary(body)
+      @ticket = body[:send_summary_response][:ticket]
     end
   end
 end
