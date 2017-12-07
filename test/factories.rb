@@ -21,6 +21,13 @@ FactoryBot.define do
     initialize_with { new(attributes) }
   end
 
+  factory :credit_note, class: 'SunatInvoice::CreditNote' do
+    provider { build(:provider) }
+    customer { build(:customer) }
+    document_number 'F001-211'
+    currency 'PEN'
+  end
+
   factory :daily_summary, class: 'SunatInvoice::DailySummary' do
     provider { build(:provider) }
     signature { build(:signature, provider: provider) }

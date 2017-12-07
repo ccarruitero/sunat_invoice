@@ -9,7 +9,6 @@ require_relative 'trade_document'
 
 module SunatInvoice
   class Invoice < TradeDocument
-    attr_accessor :document_type, :document_number, :items
 
     def initialize(*args)
       super(*args)
@@ -32,7 +31,7 @@ module SunatInvoice
     end
 
     def namespaces
-      INVOICE_NAMESPACES
+      INVOICE_NAMESPACES.merge(TRADE_NAMESPACES)
     end
 
     def xml

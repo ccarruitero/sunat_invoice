@@ -4,6 +4,7 @@ module SunatInvoice
   module Utils
     @namespace_path = 'urn:oasis:names:specification:ubl:schema:xsd'
     @sunat_namespace_path = 'urn:sunat:names:specification:ubl:peru:schema:xsd'
+    @un_namespace_path = 'urn:un:unece:uncefact:data:specification'
 
     COMMON_NAMESPACES = {
       cac: "#{@namespace_path}:CommonAggregateComponents-2",
@@ -14,8 +15,7 @@ module SunatInvoice
       xsi: 'http://www.w3.org/2001/XMLSchema-instance'
     }.freeze
 
-    INVOICE_NAMESPACES = {
-      'xmlns' => "#{@namespace_path}:Invoice-2",
+    TRADE_NAMESPACES = {
       'xmlns:cac' => COMMON_NAMESPACES[:cac],
       'xmlns:cbc' => COMMON_NAMESPACES[:cbc],
       'xmlns:ccts' => 'urn:un:unece:uncefact:documentation:2',
@@ -23,8 +23,16 @@ module SunatInvoice
       'xmlns:ext' => COMMON_NAMESPACES[:ext],
       'xmlns:qdt' => "#{@namespace_path}:QualifiedDatatypes-2",
       'xmlns:sac' => COMMON_NAMESPACES[:sac],
-      'xmlns:udt' => 'urn:un:unece:uncefact:data:specification:UnqualifiedDataTypesSchemaModule:2',
+      'xmlns:udt' => "#{@un_namespace_path}:UnqualifiedDataTypesSchemaModule:2",
       'xmlns:xsi' => COMMON_NAMESPACES[:xsi]
+    }.freeze
+
+    INVOICE_NAMESPACES = {
+      'xmlns' => "#{@namespace_path}:Invoice-2"
+    }.freeze
+
+    CREDIT_NOTE_NAMESPACES = {
+      'xmlns' => "#{@namespace_path}:CreditNote-2"
     }.freeze
 
     SUMMARY_NAMESPACES = {
