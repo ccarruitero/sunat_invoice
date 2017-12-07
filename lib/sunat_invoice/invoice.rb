@@ -27,18 +27,24 @@ module SunatInvoice
       @customer = opts[:customer] || SunatInvoice::Customer.new
     end
 
-    def namespaces
-      INVOICE_NAMESPACES.merge(TRADE_NAMESPACES)
-    end
-
     def xml
-      build = build_xml('Invoice') do |xml|
+      build = build_xml do |xml|
         build_document_data(xml)
         build_common_content(xml)
       end
 
       invoice_xml = build.to_xml
       @signature.sign(invoice_xml)
+    end
+
+    private
+
+    def root_name
+      'Invoice'
+    end
+
+    def namespaces
+      INVOICE_NAMESPACES.merge(TRADE_NAMESPACES)
     end
   end
 end

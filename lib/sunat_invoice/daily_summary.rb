@@ -9,7 +9,7 @@ module SunatInvoice
     end
 
     def xml
-      build = build_xml('SummaryDocuments') do |xml|
+      build = build_xml do |xml|
         build_number(xml)
         build_summary_info(xml)
         @signature.signer_data(xml)
@@ -28,6 +28,10 @@ module SunatInvoice
     end
 
     private
+
+    def root_name
+      'SummaryDocuments'
+    end
 
     def document_number
       formatted = date.strftime('%Y%m%d') #  YYYYMMDD

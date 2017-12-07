@@ -8,7 +8,7 @@ module SunatInvoice
                   :description
 
     def xml
-      build = build_xml('CreditNote') do |xml|
+      build = build_xml do |xml|
         build_document_data(xml)
         build_discrepancy_response(xml)
         build_billing_reference(xml)
@@ -18,6 +18,10 @@ module SunatInvoice
     end
 
     private
+
+    def root_name
+      'CreditNote'
+    end
 
     def namespaces
       CREDIT_NOTE_NAMESPACES.merge(TRADE_NAMESPACES)

@@ -17,9 +17,9 @@ module SunatInvoice
       @date ||= Date.today
     end
 
-    def build_xml(root, &block)
+    def build_xml(&block)
       Nokogiri::XML::Builder.new do |xml|
-        xml.send(root, namespaces) do
+        xml.send(root_name, namespaces) do
           build_ext(xml)
           xml['cbc'].UBLVersionID UBL_VERSION
           xml['cbc'].CustomizationID CUSTOMIZATION
