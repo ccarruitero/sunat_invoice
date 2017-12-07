@@ -2,7 +2,7 @@
 
 module SunatInvoice
   class DailySummary < XmlDocument
-    attr_accessor :reference_date, :lines
+    attr_accessor :reference_date
 
     def namespaces
       SUMMARY_NAMESPACES
@@ -37,12 +37,6 @@ module SunatInvoice
     def build_summary_info(xml)
       xml['cbc'].ReferenceDate formatted_date(reference_date)
       xml['cbc'].IssueDate formatted_date(date)
-    end
-
-    def build_lines_xml(xml)
-      lines&.each_with_index do |line, index|
-        line.xml(xml, index, currency)
-      end
     end
   end
 end

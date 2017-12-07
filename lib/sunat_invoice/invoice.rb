@@ -9,7 +9,6 @@ require_relative 'trade_document'
 
 module SunatInvoice
   class Invoice < TradeDocument
-
     def initialize(*args)
       super(*args)
       opts = args[0] || {}
@@ -21,7 +20,7 @@ module SunatInvoice
       @document_type = opts[:document_type] || '01'
       @document_number = opts[:document_number] || 'F001-1'
       @currency = opts[:currency] || 'PEN'
-      @items ||= []
+      @lines ||= []
       @signature = SunatInvoice::Signature.new(provider: @provider)
     end
 
@@ -44,7 +43,7 @@ module SunatInvoice
         @customer.info(xml)
         build_tax_totals(xml)
         build_total(xml)
-        build_items(xml)
+        build_lines_xml(xml)
       end
 
       invoice_xml = build.to_xml
@@ -67,7 +66,7 @@ module SunatInvoice
     def calculate_sale_totals
       @sale_totals = {}
       # get bi totals according kind of sale (gravado, inafecto, exonerado ..)
-      items.each do |item|
+      lines.each do |item|
         # TODO: I think in most cases only be one tax for item, but should
         #       handle more cases
         total_code = get_total_code(item.taxes.first)
@@ -81,16 +80,10 @@ module SunatInvoice
     def calculate_tax_totals
       # concat item's sale_taxes
       @tax_totals = {}
-      taxes = items.map(&:sale_taxes).flatten
+      taxes = lines.map(&:sale_taxes).flatten
       taxes.each do |tax|
         @tax_totals[tax.keys.first] ||= 0
         @tax_totals[tax.keys.first] += tax.values.sum
-      end
-    end
-
-    def build_items(xml)
-      items.each_with_index do |item, index|
-        item.xml(xml, index, @currency)
       end
     end
 
@@ -108,10 +101,6 @@ module SunatInvoice
       xml['cac'].LegalMonetaryTotal do
         amount_xml(xml['cbc'], 'PayableAmount', @total, @currency)
       end
-    end
-
-    def add_item(item)
-      items << item if item.is_a?(SunatInvoice::Item)
     end
 
     def get_total_code(tax)

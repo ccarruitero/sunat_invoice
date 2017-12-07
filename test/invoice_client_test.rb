@@ -26,7 +26,7 @@ scope 'SunatInvoice::InvoiceClient' do
     @invoice = SunatInvoice::Invoice.new(provider: @provider,
                                          customer: customer,
                                          document_number: 'FY02-234')
-    @invoice.items << item
+    @invoice.lines << item
   end
 
   test 'should use dev service when not define environment' do

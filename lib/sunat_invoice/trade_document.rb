@@ -2,7 +2,7 @@
 
 module SunatInvoice
   class TradeDocument < XmlDocument
-    attr_accessor :customer, :document_number, :items
+    attr_accessor :customer, :document_number
 
     def operation
       :send_bill

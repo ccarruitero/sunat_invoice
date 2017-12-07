@@ -8,7 +8,7 @@ setup do
   @invoice = FactoryBot.build(:invoice, provider: @provider)
   tax = SunatInvoice::Tax.new(amount: 3.6, tax_type: :igv)
   item_attr = { quantity: 10, price: 20, price_code: '01', taxes: [tax] }
-  @invoice.items << SunatInvoice::Item.new(item_attr)
+  @invoice.lines << SunatInvoice::Item.new(item_attr)
   @parsed_xml = Nokogiri::XML(@invoice.xml, &:noblanks)
 end
 
@@ -128,7 +128,7 @@ test '#calculate_tax_totals' do
   tax = FactoryBot.build(:tax, amount: 15)
   invoice = FactoryBot.build(:invoice)
   2.times do
-    invoice.items << FactoryBot.build(:item, taxes: [tax])
+    invoice.lines << FactoryBot.build(:item, taxes: [tax])
   end
   invoice.calculate_tax_totals
   tax_totals = invoice.instance_variable_get('@tax_totals')

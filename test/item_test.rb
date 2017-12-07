@@ -14,7 +14,7 @@ end
 def invoice_setup
   # add item to invoice in order to setup namespaces
   invoice = FactoryBot.build(:invoice)
-  invoice.items << @item
+  invoice.lines << @item
   invoice_xml = Nokogiri::XML(invoice.xml, &:noblanks)
   @item_xml = invoice_xml.xpath('//cac:InvoiceLine')
 end
