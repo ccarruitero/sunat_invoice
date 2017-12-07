@@ -5,13 +5,10 @@ require 'savon'
 
 module SunatInvoice
   class Client
-    def initialize(env = 'dev')
+    def initialize(env = 'dev', log = false)
       @env = env
+      @log = log
       @soap_client = savon_client
-    end
-
-    def log
-      (@env != 'prod')
     end
 
     private
@@ -30,7 +27,7 @@ module SunatInvoice
       Savon.client(wsdl: wsdl,
                    wsse_auth: authentication,
                    namespace: 'http://service.sunat.gob.pe',
-                   log: log)
+                   log: @log)
     end
   end
 end
