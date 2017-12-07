@@ -10,6 +10,7 @@ require 'sunat_invoice/tax'
 require 'sunat_invoice/daily_summary'
 require 'sunat_invoice/summary_line'
 require 'sunat_invoice/credit_note'
+require 'sunat_invoice/credit_note_line'
 
 # clients
 require 'sunat_invoice/configuration'
