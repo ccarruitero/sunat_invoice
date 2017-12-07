@@ -49,4 +49,10 @@ scope 'SunatInvoice::InvoiceClient' do
     response = @client.dispatch(summary)
     assert_equal response.http.code, 200
   end
+
+  test 'get status' do
+    ticket = rand(10**15).to_s
+    response = @client.get_status(ticket)
+    assert_equal response.http.code, 200
+  end
 end

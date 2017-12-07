@@ -35,6 +35,10 @@ module SunatInvoice
                         message: { fileName: "#{name}.zip", contentFile: zip })
     end
 
+    def get_status(ticket)
+      @soap_client.call(:get_status, message: { ticket: ticket })
+    end
+
     private
 
     def encode(zip_str)
