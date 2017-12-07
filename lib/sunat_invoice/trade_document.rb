@@ -12,7 +12,7 @@ module SunatInvoice
 
     def build_document_data(xml)
       build_number(xml)
-      xml['cbc'].IssueDate formated_date(date)
+      xml['cbc'].IssueDate formatted_date(date)
       xml['cbc'].InvoiceTypeCode document_type if document_type
       xml['cbc'].DocumentCurrencyCode currency
     end

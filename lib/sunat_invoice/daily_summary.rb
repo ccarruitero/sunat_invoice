@@ -30,13 +30,13 @@ module SunatInvoice
     private
 
     def document_number
-      formated = date.strftime('%Y%m%d') #  YYYYMMDD
-      "RC-#{formated}-1"
+      formatted = date.strftime('%Y%m%d') #  YYYYMMDD
+      "RC-#{formatted}-1"
     end
 
     def build_summary_info(xml)
-      xml['cbc'].ReferenceDate formated_date(reference_date)
-      xml['cbc'].IssueDate formated_date(date)
+      xml['cbc'].ReferenceDate formatted_date(reference_date)
+      xml['cbc'].IssueDate formatted_date(date)
     end
 
     def build_lines_xml(xml)

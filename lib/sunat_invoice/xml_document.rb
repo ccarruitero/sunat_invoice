@@ -39,7 +39,7 @@ module SunatInvoice
       xml['cbc'].ID document_number
     end
 
-    def formated_date(date)
+    def formatted_date(date)
       date.strftime('%Y-%m-%d')
     end
   end
