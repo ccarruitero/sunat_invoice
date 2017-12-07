@@ -7,8 +7,25 @@ module SunatInvoice
   class Provider < Tributer
     include Utils
 
-    attr_accessor :signature_id, :signature_location_id, :uri, :pk_file,
-                  :cert_file
+    attr_accessor :signature_id, :signature_location_id, :pk_file, :cert_file
+
+    def info(xml, with_address = true)
+      xml['cac'].AccountingSupplierParty do
+        xml['cbc'].CustomerAssignedAccountID ruc
+        xml['cbc'].AdditionalAccountID document_type
+        build_party_xml(xml, with_address)
+      end
+    end
+
+    private
+
+    def build_party_xml(xml, with_address)
+      xml['cac'].Party do
+        build_name(xml)
+        xml['cac'].PostalAddress { address(xml) } if with_address
+        build_registration_name(xml)
+      end
+    end
 
     def address(xml)
       xml['cbc'].ID @ubigeo
@@ -35,18 +52,6 @@ module SunatInvoice
     def build_registration_name(xml)
       xml['cac'].PartyLegalEntity do
         xml['cbc'].RegistrationName name
-      end
-    end
-
-    def info(xml, with_address = true)
-      xml['cac'].AccountingSupplierParty do
-        xml['cbc'].CustomerAssignedAccountID ruc
-        xml['cbc'].AdditionalAccountID document_type
-        xml['cac'].Party do
-          build_name(xml)
-          xml['cac'].PostalAddress { address(xml) } if with_address
-          build_registration_name(xml)
-        end
       end
     end
   end
