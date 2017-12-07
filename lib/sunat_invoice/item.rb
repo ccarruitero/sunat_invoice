@@ -1,13 +1,10 @@
 # frozen_string_literal: true
 
-require_relative 'utils'
+require_relative 'line'
 
 module SunatInvoice
-  class Item < Model
-    include Utils
-
-    attr_accessor :quantity, :description, :price, :price_code, :unit_code,
-                  :taxes
+  class Item < Line
+    attr_accessor :quantity, :description, :price, :price_code, :unit_code
 
     def initialize(*args)
       # * quantity - quantity of item
@@ -52,7 +49,7 @@ module SunatInvoice
         xml['cbc'].InvoicedQuantity(@quantity, unitCode: unit_code)
         amount_xml(xml['cbc'], 'LineExtensionAmount', bi_value, currency)
         build_pricing_reference(xml, currency)
-        taxes_xml(xml, currency)
+        build_taxes_xml(xml, currency)
         build_item(xml)
         build_price(xml, currency)
       end
@@ -76,12 +73,6 @@ module SunatInvoice
     def build_price(xml, currency)
       xml['cac'].Price do
         amount_xml(xml['cbc'], 'PriceAmount', price, currency)
-      end
-    end
-
-    def taxes_xml(xml, currency)
-      taxes&.each do |tax|
-        tax.xml(xml, currency)
       end
     end
   end

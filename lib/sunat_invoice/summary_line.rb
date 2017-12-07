@@ -1,15 +1,12 @@
 # frozen_string_literal: true
 
-require_relative 'model'
-require_relative 'utils'
+require_relative 'line'
 
 module SunatInvoice
-  class SummaryLine < Model
-    include Utils
-
+  class SummaryLine < Line
     attr_accessor :document_type, :document_serial, :start_document_number,
-                  :end_document_number, :total_amount, :taxes, :taxable,
-                  :non_taxable, :exempt, :other_charge, :charge_type
+                  :end_document_number, :total_amount, :taxable, :non_taxable,
+                  :exempt, :other_charge, :charge_type
 
     CHARGES = {
       discount: false,
@@ -73,12 +70,6 @@ module SunatInvoice
 
     def resolve_charge_type
       charge_type ? CHARGES[charge_type] : CHARGES.values.first
-    end
-
-    def build_taxes_xml(xml, currency)
-      taxes&.each do |tax|
-        tax.xml(xml, currency)
-      end
     end
   end
 end
