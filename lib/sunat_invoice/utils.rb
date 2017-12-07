@@ -35,6 +35,10 @@ module SunatInvoice
       'xmlns' => "#{@namespace_path}:CreditNote-2"
     }.freeze
 
+    DEBIT_NOTE_NAMESPACES = {
+      'xmlns' => "#{@namespace_path}:DebitNote-2"
+    }.freeze
+
     SUMMARY_NAMESPACES = {
       'xmlns' => "#{@sunat_namespace_path}:SummaryDocuments-1",
       'xmlns:cac' => COMMON_NAMESPACES[:cac],

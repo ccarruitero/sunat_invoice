@@ -39,8 +39,30 @@ FactoryBot.define do
     ref_document_type '01'
     response_code '01'
     document_type '07'
-    description 'Unidades defectuosas'
+    description 'Some awesome product'
     lines { [build(:credit_note_line)] }
+  end
+
+  factory :debit_note_line, class: 'SunatInvoice::DebitNoteLine' do
+    quantity 10
+    unit_code 'NIU'
+    price 20
+    price_code '01'
+    description 'Ajuste de precio'
+    taxes { [build(:tax, amount: 3.6)] }
+  end
+
+  factory :debit_note, class: 'SunatInvoice::DebitNote' do
+    provider { build(:provider) }
+    customer { build(:customer) }
+    document_number 'F001-211'
+    currency 'PEN'
+    ref_document_number 'F001-342'
+    ref_document_type '01'
+    response_code '01'
+    document_type '08'
+    description 'Unidades defectuosas'
+    lines { [build(:debit_note_line)] }
   end
 
   factory :daily_summary, class: 'SunatInvoice::DailySummary' do
