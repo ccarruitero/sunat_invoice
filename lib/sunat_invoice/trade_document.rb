@@ -1,9 +1,12 @@
 # frozen_string_literal: false
 
 require_relative 'tax'
+require_relative 'trade_calculations'
 
 module SunatInvoice
   class TradeDocument < XmlDocument
+    include TradeCalculations
+
     attr_accessor :customer, :document_number
 
     def operation
@@ -26,6 +29,7 @@ module SunatInvoice
     end
 
     def build_sale_totals(xml)
+      prepare_totals
       ubl_ext(xml) do
         xml['sac'].AdditionalInformation do
           @sale_totals&.each do |code, amount|
