@@ -19,6 +19,25 @@ module SunatInvoice
       @taxes ||= []
     end
 
+    def line_tag_name
+      'InvoiceLine'
+    end
+
+    def quantity_tag_name
+      'InvoicedQuantity'
+    end
+
+    def xml(xml, index, currency)
+      xml['cac'].send(line_tag_name) do
+        build_basic_line_xml(xml, index)
+        amount_xml(xml['cbc'], 'LineExtensionAmount', bi_value, currency)
+        build_pricing_reference(xml, currency)
+        build_taxes_xml(xml, currency)
+        build_item(xml)
+        build_price(xml, currency)
+      end
+    end
+
     def bi_value
       # bi of sale = price without taxes * quantity
       (@price.to_f * @quantity.to_f).round(2)
@@ -39,20 +58,15 @@ module SunatInvoice
       (@price.to_f + sum_taxes).round(2)
     end
 
+    private
+
     def sum_taxes
       taxes.map(&:amount).sum
     end
 
-    def xml(xml, index, currency)
-      xml['cac'].InvoiceLine do
-        xml['cbc'].ID(index + 1)
-        xml['cbc'].InvoicedQuantity(@quantity, unitCode: unit_code)
-        amount_xml(xml['cbc'], 'LineExtensionAmount', bi_value, currency)
-        build_pricing_reference(xml, currency)
-        build_taxes_xml(xml, currency)
-        build_item(xml)
-        build_price(xml, currency)
-      end
+    def build_basic_line_xml(xml, index)
+      xml['cbc'].ID(index + 1)
+      xml['cbc'].send(quantity_tag_name, quantity, unitCode: unit_code)
     end
 
     def build_item(xml)
