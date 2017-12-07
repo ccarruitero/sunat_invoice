@@ -124,16 +124,16 @@ test 'has total tag' do
   assert total.count.positive?
 end
 
-test '#calculate_tax_totals' do
+test '#calculate_taxes_totals' do
   tax = FactoryBot.build(:tax, amount: 15)
   invoice = FactoryBot.build(:invoice)
   2.times do
     invoice.lines << FactoryBot.build(:item, taxes: [tax])
   end
-  invoice.calculate_tax_totals
-  tax_totals = invoice.instance_variable_get('@tax_totals')
-  assert_equal tax_totals.count, 1
-  assert_equal tax_totals[:igv], 300
+  invoice.calculate_taxes_totals
+  taxes_totals = invoice.instance_variable_get('@taxes_totals')
+  assert_equal taxes_totals.count, 1
+  assert_equal taxes_totals[:igv], 300
 end
 
 test '#get_total_igv_code' do

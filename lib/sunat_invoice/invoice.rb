@@ -3,7 +3,6 @@
 require_relative 'provider'
 require_relative 'customer'
 require_relative 'signature'
-require_relative 'tax'
 require_relative 'catalogs'
 require_relative 'trade_document'
 
@@ -38,12 +37,7 @@ module SunatInvoice
 
       build = build_xml('Invoice') do |xml|
         build_document_data(xml)
-        @signature.signer_data(xml)
-        @provider.info(xml)
-        @customer.info(xml)
-        build_tax_totals(xml)
-        build_total(xml)
-        build_lines_xml(xml)
+        build_common_content(xml)
       end
 
       invoice_xml = build.to_xml
@@ -51,7 +45,7 @@ module SunatInvoice
     end
 
     def prepare_totals
-      calculate_tax_totals
+      calculate_taxes_totals
       calculate_sale_totals
       calculate_total
     end
@@ -59,7 +53,7 @@ module SunatInvoice
     def calculate_total
       # calculate invoice total
       @total = 0
-      @total += @tax_totals.values.sum
+      @total += @taxes_totals.values.sum
       @total += @sale_totals.values.sum
     end
 
@@ -77,30 +71,18 @@ module SunatInvoice
       end
     end
 
-    def calculate_tax_totals
+    def calculate_taxes_totals
       # concat item's sale_taxes
-      @tax_totals = {}
+      @taxes_totals = {}
       taxes = lines.map(&:sale_taxes).flatten
       taxes.each do |tax|
-        @tax_totals[tax.keys.first] ||= 0
-        @tax_totals[tax.keys.first] += tax.values.sum
+        @taxes_totals[tax.keys.first] ||= 0
+        @taxes_totals[tax.keys.first] += tax.values.sum
       end
     end
 
     def document_name
       "#{@provider.ruc}-#{document_type}-#{document_number}"
-    end
-
-    def build_tax_totals(xml)
-      @tax_totals.each do |key, value|
-        SunatInvoice::Tax.new(tax_type: key, amount: value).xml(xml, @currency)
-      end
-    end
-
-    def build_total(xml)
-      xml['cac'].LegalMonetaryTotal do
-        amount_xml(xml['cbc'], 'PayableAmount', @total, @currency)
-      end
     end
 
     def get_total_code(tax)

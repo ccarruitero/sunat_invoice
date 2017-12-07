@@ -26,6 +26,10 @@ FactoryBot.define do
     customer { build(:customer) }
     document_number 'F001-211'
     currency 'PEN'
+    ref_document_number 'F001-342'
+    ref_document_type '01'
+    response_code '01'
+    description 'Unidades defectuosas'
   end
 
   factory :daily_summary, class: 'SunatInvoice::DailySummary' do

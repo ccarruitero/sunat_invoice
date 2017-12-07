@@ -22,7 +22,7 @@ module SunatInvoice
                           tipoComprobante: options[:document_type],
                           serieComprobante: options[:document_serial],
                           numeroComprobante: options[:document_number]
-                       })
+                        })
     end
   end
 end

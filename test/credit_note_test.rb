@@ -11,6 +11,5 @@ setup do
 end
 
 test 'start with CreditNote tag' do
-  puts @parsed_xml
   assert_equal @parsed_xml.root.name, 'CreditNote'
 end

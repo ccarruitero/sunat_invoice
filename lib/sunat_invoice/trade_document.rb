@@ -1,5 +1,7 @@
 # frozen_string_literal: false
 
+require_relative 'tax'
+
 module SunatInvoice
   class TradeDocument < XmlDocument
     attr_accessor :customer, :document_number
@@ -33,6 +35,27 @@ module SunatInvoice
             end
           end
         end
+      end
+    end
+
+    def build_common_content(xml)
+      @signature.signer_data(xml)
+      @provider.info(xml)
+      @customer.info(xml)
+      build_taxes_totals(xml)
+      build_total(xml)
+      build_lines_xml(xml)
+    end
+
+    def build_taxes_totals(xml)
+      @taxes_totals.each do |key, value|
+        SunatInvoice::Tax.new(tax_type: key, amount: value).xml(xml, @currency)
+      end
+    end
+
+    def build_total(xml)
+      xml['cac'].LegalMonetaryTotal do
+        amount_xml(xml['cbc'], 'PayableAmount', @total, @currency)
       end
     end
   end
