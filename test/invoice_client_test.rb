@@ -10,9 +10,9 @@ scope 'SunatInvoice::InvoiceClient' do
                                  ruc: '20100454523',
                                  name: 'SOPORTE TECNOLOGICO EIRL')
 
-    customer = FactoryBot.build(:customer,
-                                ruc: '20293028401',
-                                name: 'SOME BUSINESS')
+    @customer = FactoryBot.build(:customer,
+                                 ruc: '20293028401',
+                                 name: 'SOME BUSINESS')
     SunatInvoice.configure do |c|
       c.account_ruc = @provider.ruc
       c.account_user = 'MODDATOS'
@@ -24,7 +24,7 @@ scope 'SunatInvoice::InvoiceClient' do
     tax = SunatInvoice::Tax.new(amount: 3.6, tax_type: :igv)
     item = FactoryBot.build(:item, taxes: [tax])
     @invoice = SunatInvoice::Invoice.new(provider: @provider,
-                                         customer: customer,
+                                         customer: @customer,
                                          document_number: 'FY02-234')
     @invoice.lines << item
   end
@@ -35,6 +35,18 @@ scope 'SunatInvoice::InvoiceClient' do
 
   test 'send invoice success' do
     response = @client.dispatch(@invoice)
+    assert_equal response.http.code, 200
+  end
+
+  test 'send credit note' do
+    tax = SunatInvoice::Tax.new(amount: 3.6, tax_type: :igv)
+    line = FactoryBot.build(:credit_note_line, taxes: [tax])
+    signature = FactoryBot.build(:signature, provider: @provider)
+    credit_note = FactoryBot.build(:credit_note, provider: @provider,
+                                                 customer: @customer,
+                                                 lines: [line],
+                                                 signature: signature)
+    response = @client.dispatch(credit_note)
     assert_equal response.http.code, 200
   end
 

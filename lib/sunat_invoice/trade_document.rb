@@ -7,18 +7,28 @@ module SunatInvoice
   class TradeDocument < XmlDocument
     include TradeCalculations
 
-    attr_accessor :customer, :document_number
+    attr_accessor :customer, :document_number, :document_type
+
+    INVOICE_TYPES = %w[01 03].freeze
 
     def operation
       :send_bill
     end
 
+    def document_name
+      "#{@provider.ruc}-#{document_type}-#{document_number}"
+    end
+
     private
+
+    def invoice?
+      INVOICE_TYPES.include?(document_type)
+    end
 
     def build_document_data(xml)
       build_number(xml)
       xml['cbc'].IssueDate formatted_date(date)
-      xml['cbc'].InvoiceTypeCode document_type if document_type
+      xml['cbc'].InvoiceTypeCode document_type if invoice?
       xml['cbc'].DocumentCurrencyCode currency
     end
 

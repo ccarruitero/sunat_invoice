@@ -21,6 +21,15 @@ FactoryBot.define do
     initialize_with { new(attributes) }
   end
 
+  factory :credit_note_line, class: 'SunatInvoice::CreditNoteLine' do
+    quantity 10
+    unit_code 'NIU'
+    price 20
+    price_code '01'
+    description 'Grabadora Externo'
+    taxes { [build(:tax, amount: 3.6)] }
+  end
+
   factory :credit_note, class: 'SunatInvoice::CreditNote' do
     provider { build(:provider) }
     customer { build(:customer) }
@@ -29,7 +38,9 @@ FactoryBot.define do
     ref_document_number 'F001-342'
     ref_document_type '01'
     response_code '01'
+    document_type '07'
     description 'Unidades defectuosas'
+    lines { [build(:credit_note_line)] }
   end
 
   factory :daily_summary, class: 'SunatInvoice::DailySummary' do

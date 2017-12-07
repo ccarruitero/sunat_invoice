@@ -40,9 +40,5 @@ module SunatInvoice
       invoice_xml = build.to_xml
       @signature.sign(invoice_xml)
     end
-
-    def document_name
-      "#{@provider.ruc}-#{document_type}-#{document_number}"
-    end
   end
 end
