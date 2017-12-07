@@ -5,19 +5,16 @@ require_relative 'customer'
 require_relative 'signature'
 require_relative 'tax'
 require_relative 'catalogs'
+require_relative 'trade_document'
 
 module SunatInvoice
-  class Invoice < XmlDocument
+  class Invoice < TradeDocument
     attr_accessor :document_type, :document_number, :items
 
     def initialize(*args)
       super(*args)
       opts = args[0] || {}
       init_defaults(opts)
-    end
-
-    def operation
-      :send_bill
     end
 
     def init_defaults(opts)
@@ -42,7 +39,7 @@ module SunatInvoice
       prepare_totals
 
       build = build_xml('Invoice') do |xml|
-        build_invoice_data(xml)
+        build_document_data(xml)
         @signature.signer_data(xml)
         @provider.info(xml)
         @customer.info(xml)
@@ -92,19 +89,6 @@ module SunatInvoice
       end
     end
 
-    def build_ext(xml)
-      super(xml) do |xml_|
-        build_sale_totals(xml_)
-      end
-    end
-
-    def build_invoice_data(xml)
-      build_number(xml)
-      xml['cbc'].IssueDate formated_date(date)
-      xml['cbc'].InvoiceTypeCode @document_type
-      xml['cbc'].DocumentCurrencyCode @currency
-    end
-
     def build_items(xml)
       items.each_with_index do |item, index|
         item.xml(xml, index, @currency)
@@ -118,19 +102,6 @@ module SunatInvoice
     def build_tax_totals(xml)
       @tax_totals.each do |key, value|
         SunatInvoice::Tax.new(tax_type: key, amount: value).xml(xml, @currency)
-      end
-    end
-
-    def build_sale_totals(xml)
-      ubl_ext(xml) do
-        xml['sac'].AdditionalInformation do
-          @sale_totals.each do |code, amount|
-            xml['sac'].AdditionalMonetaryTotal do
-              xml['cbc'].ID code
-              amount_xml(xml['cbc'], 'PayableAmount', amount, @currency)
-            end
-          end
-        end
       end
     end
 
