@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<S:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"><S:Body><ns2:getStatusResponse xmlns:ns2="http://service.sunat.gob.pe"><status><content>El ticket no existe</content><statusCode>0127</statusCode></status></ns2:getStatusResponse></S:Body></S:Envelope>

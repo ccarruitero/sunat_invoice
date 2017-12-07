@@ -16,6 +16,13 @@ scope 'SunatInvoice::ResponseParser' do
     response_xml = ResponseHelper.load('summary_success.xml')
     body = ResponseHelper.parse(response_xml)
     response = SunatInvoice::ResponseParser.new(body, 'summary')
-    assert response.ticket.length > 0
+    assert response.ticket.length.positive?
+  end
+
+  test 'get_status response' do
+    response_xml = ResponseHelper.load('ticket_invalid.xml')
+    body = ResponseHelper.parse(response_xml)
+    response = SunatInvoice::ResponseParser.new(body, 'status')
+    assert_equal response.message, 'El ticket no existe'
   end
 end
