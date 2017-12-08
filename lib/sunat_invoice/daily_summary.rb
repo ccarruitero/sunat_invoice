@@ -5,7 +5,7 @@ module SunatInvoice
     attr_accessor :reference_date
 
     def namespaces
-      SUMMARY_NAMESPACES
+      DAILY_SUMMARY_NAMESPACES.merge(SUMMARY_NAMESPACES)
     end
 
     def xml

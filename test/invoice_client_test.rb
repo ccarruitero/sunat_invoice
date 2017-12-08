@@ -74,6 +74,18 @@ scope 'SunatInvoice::InvoiceClient' do
     assert_equal response.http.code, 200
   end
 
+  test 'void document' do
+    line = FactoryBot.build(:voided_line)
+    signature = FactoryBot.build(:signature, provider: @provider)
+    voided = SunatInvoice::Voided.new(provider: @provider,
+                                      signature: signature,
+                                      reference_date: Date.today,
+                                      currency: 'PEN',
+                                      lines: [line])
+    response = @client.dispatch(voided)
+    assert_equal response.http.code, 200
+  end
+
   test 'get status' do
     ticket = rand(10**15).to_s
     response = @client.get_status(ticket)

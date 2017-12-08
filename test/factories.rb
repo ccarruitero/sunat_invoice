@@ -108,4 +108,11 @@ FactoryBot.define do
     taxes { [build(:tax, amount: 360), build(:tax, amount: 0, tax_type: :isc)] }
     total_amount 2360
   end
+
+  factory :voided_line, class: 'SunatInvoice::VoidedLine' do
+    document_type '03'
+    document_serial 'BD56'
+    document_number 231
+    description 'Anulación documento'
+  end
 end

@@ -40,14 +40,21 @@ module SunatInvoice
     }.freeze
 
     SUMMARY_NAMESPACES = {
-      'xmlns' => "#{@sunat_namespace_path}:SummaryDocuments-1",
       'xmlns:cac' => COMMON_NAMESPACES[:cac],
       'xmlns:cbc' => COMMON_NAMESPACES[:cbc],
       'xmlns:ds' => COMMON_NAMESPACES[:ds],
       'xmlns:ext' => COMMON_NAMESPACES[:ext],
       'xmlns:sac' => COMMON_NAMESPACES[:sac],
-      'xmlns:xsi' => COMMON_NAMESPACES[:xsi],
+      'xmlns:xsi' => COMMON_NAMESPACES[:xsi]
+    }.freeze
+
+    DAILY_SUMMARY_NAMESPACES = {
+      'xmlns' => "#{@sunat_namespace_path}:SummaryDocuments-1",
       'xsi:schemaLocation' => 'urn:sunat:names:specification:ubl:peru:schema:xsd:InvoiceSummary-1 D:\UBL_SUNAT\SUNAT_xml_20110112\20110112\xsd\maindoc\UBLPE-InvoiceSummary-1.0.xsd'
+    }.freeze
+
+    VOIDED_NAMESPACES = {
+      'xmlns' => "#{@sunat_namespace_path}:VoidedDocuments-1"
     }.freeze
 
     def ubl_ext(xml, &block)
