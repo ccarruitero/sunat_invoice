@@ -20,5 +20,9 @@ module SunatInvoice
     def namespaces
       DEBIT_NOTE_NAMESPACES.merge(TRADE_NAMESPACES)
     end
+
+    def total_tag
+      'RequestedMonetaryTotal'
+    end
   end
 end

@@ -50,6 +50,18 @@ scope 'SunatInvoice::InvoiceClient' do
     assert_equal response.http.code, 200
   end
 
+  test 'send debit note' do
+    tax = SunatInvoice::Tax.new(amount: 3.6, tax_type: :igv)
+    line = FactoryBot.build(:debit_note_line, taxes: [tax])
+    signature = FactoryBot.build(:signature, provider: @provider)
+    debit_note = FactoryBot.build(:debit_note, provider: @provider,
+                                               customer: @customer,
+                                               lines: [line],
+                                               signature: signature)
+    response = @client.dispatch(debit_note)
+    assert_equal response.http.code, 200
+  end
+
   test 'send summary success' do
     line = FactoryBot.build(:summary_line)
     signature = FactoryBot.build(:signature, provider: @provider)
