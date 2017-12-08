@@ -4,6 +4,18 @@ require_relative 'trade_document'
 
 module SunatInvoice
   class CreditNote < TradeDocument
+    # * date - issued date
+    # * ref_document_number - serial and number of document affected
+    # * ref_document_type - type of document affected
+    # * response_code - reason for which credit note is issued (CATALOG_09)
+    # * description - description of reason
+    # * document_type - should be '07' according CATALOG_01
+    # * document_number - serial and correlative number of document
+    # * provider - a SunatInvoice::Provider instance
+    # * customer - a SunatInvoice::Customer instance
+    # * signature - a SunatInvoice::Signature instance
+    # * lines - array of SunatInvoice::CreditNoteLine instances
+
     attr_accessor :ref_document_number, :ref_document_type, :response_code,
                   :description
 
