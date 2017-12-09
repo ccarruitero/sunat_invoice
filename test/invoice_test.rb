@@ -141,7 +141,8 @@ test '#get_total_igv_code' do
   assert_equal invoice.get_total_igv_code('11'), '1004'
   assert_equal invoice.get_total_igv_code('15'), '1004'
   assert_equal invoice.get_total_igv_code('20'), '1003'
-  assert_equal invoice.get_total_igv_code('32'), '1002'
+  assert_equal invoice.get_total_igv_code('30'), '1002'
+  assert_equal invoice.get_total_igv_code('32'), '1004'
   assert invoice.get_total_igv_code('42').nil?
 end
 

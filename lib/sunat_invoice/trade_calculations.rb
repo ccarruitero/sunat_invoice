@@ -14,7 +14,7 @@ module SunatInvoice
       # calculate invoice total
       @total = 0
       @total += @taxes_totals.values.sum
-      @total += @sale_totals.values.sum
+      @total += @sale_totals.reject { |k, _v| k == '1004' }.values.sum
       @total -= discount if discount
     end
 
@@ -58,8 +58,10 @@ module SunatInvoice
         Catalogs::CATALOG_14[3]
       elsif Catalogs::CATALOG_07[7] == exemption_reason
         Catalogs::CATALOG_14[2]
-      elsif Catalogs::CATALOG_07[8..14].include?(exemption_reason)
+      elsif Catalogs::CATALOG_07[8] == exemption_reason
         Catalogs::CATALOG_14[1]
+      elsif Catalogs::CATALOG_07[9..14].include?(exemption_reason)
+        Catalogs::CATALOG_14[3]
       end
     end
   end
