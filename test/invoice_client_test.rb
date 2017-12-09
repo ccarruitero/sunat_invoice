@@ -17,7 +17,6 @@ scope 'SunatInvoice::InvoiceClient' do
       c.account_ruc = @provider.ruc
       c.account_user = 'MODDATOS'
       c.account_password = 'moddatos'
-      c.provider = @provider
     end
     @client = SunatInvoice::InvoiceClient.new
 
