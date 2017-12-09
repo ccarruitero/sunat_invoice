@@ -144,3 +144,10 @@ test '#get_total_igv_code' do
   assert_equal invoice.get_total_igv_code('32'), '1002'
   assert invoice.get_total_igv_code('42').nil?
 end
+
+test 'could have discounts' do
+  @invoice.discount = 25
+  parsed_xml = Nokogiri::XML(@invoice.xml, &:noblanks)
+  discount_node = parsed_xml.xpath('//sac:AdditionalMonetaryTotal').last
+  assert_equal discount_node.at_xpath('descendant::cbc:ID').content, '2005'
+end

@@ -15,6 +15,7 @@ module SunatInvoice
       @total = 0
       @total += @taxes_totals.values.sum
       @total += @sale_totals.values.sum
+      @total -= discount if discount
     end
 
     def calculate_sale_totals

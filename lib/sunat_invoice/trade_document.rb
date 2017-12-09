@@ -7,7 +7,7 @@ module SunatInvoice
   class TradeDocument < XmlDocument
     include TradeCalculations
 
-    attr_accessor :customer, :document_number, :document_type
+    attr_accessor :customer, :document_number, :document_type, :discount
 
     INVOICE_TYPES = %w[01 03].freeze
 
@@ -43,12 +43,17 @@ module SunatInvoice
       ubl_ext(xml) do
         xml['sac'].AdditionalInformation do
           @sale_totals&.each do |code, amount|
-            xml['sac'].AdditionalMonetaryTotal do
-              xml['cbc'].ID code
-              amount_xml(xml['cbc'], 'PayableAmount', amount, @currency)
-            end
+            build_monetary_total(xml, code, amount)
           end
+          build_monetary_total(xml, '2005', discount) if discount
         end
+      end
+    end
+
+    def build_monetary_total(xml, code, amount)
+      xml['sac'].AdditionalMonetaryTotal do
+        xml['cbc'].ID code
+        amount_xml(xml['cbc'], 'PayableAmount', amount, @currency)
       end
     end
 
