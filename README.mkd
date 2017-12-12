@@ -1,2 +1,2 @@
 # Sunat Invoice
-Ruby wrapper to use SUNAT Electronic Invoice API
+Ruby gem to use [SUNAT Electronic Billing](http://cpe.sunat.gob.pe/factura-desde-los-sistemas-del-contribuyente) from your app
