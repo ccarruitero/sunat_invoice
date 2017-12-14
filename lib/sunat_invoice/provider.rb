@@ -21,7 +21,7 @@ module SunatInvoice
 
     def build_party_xml(xml, with_address)
       xml['cac'].Party do
-        build_name(xml)
+        build_name(xml) if commercial_name
         xml['cac'].PostalAddress { address(xml) } if with_address
         build_registration_name(xml)
       end
@@ -45,7 +45,7 @@ module SunatInvoice
 
     def build_name(xml)
       xml['cac'].PartyName do
-        xml['cbc'].Name name
+        xml['cbc'].Name commercial_name
       end
     end
 
