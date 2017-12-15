@@ -1,16 +1,15 @@
 # frozen_string_literal: true
 
 module SignatureHelper
-  def self.generate_keys
-    return if exists?('pk_file')
+  def self.generate_keys(keys_dir = "#{SunatInvoice.root}/test/certs")
+    return if File.exist?("#{keys_dir}/pk_file")
 
     pk = OpenSSL::PKey::RSA.new 2048
     cert = generate_certificate(pk)
 
-    cert_dir = "#{File.dirname(__FILE__)}/../certs"
-    Dir.mkdir(cert_dir) unless Dir.exist?(cert_dir)
-    File.open(file('pk_file'), 'w') { |f| f.puts pk.to_pem }
-    File.open(file('cert_file'), 'w') { |f| f.puts cert.to_pem }
+    Dir.mkdir(keys_dir) unless Dir.exist?(keys_dir)
+    File.open("#{keys_dir}/pk_file", 'w') { |f| f.puts pk.to_pem }
+    File.open("#{keys_dir}/cert_file", 'w') { |f| f.puts cert.to_pem }
   end
 
   def self.generate_certificate(pk)
@@ -25,13 +24,5 @@ module SignatureHelper
     cert.issuer     = name
     cert.sign pk, OpenSSL::Digest::SHA1.new
     cert
-  end
-
-  def self.file(name)
-    File.join(File.dirname(__FILE__), "../certs/#{name}")
-  end
-
-  def self.exists?(name)
-    File.exist?(file(name))
   end
 end

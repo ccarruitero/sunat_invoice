@@ -26,6 +26,10 @@ require 'sunat_invoice/clients/consult_client'
 module SunatInvoice
   class << self
     attr_accessor :configuration
+
+    def root
+      File.dirname(__dir__)
+    end
   end
 
   def self.configure
