@@ -9,6 +9,15 @@ module SunatInvoice
 
     attr_accessor :customer, :document_number, :document_type, :discount
 
+    # total for document (sale totals + taxes - discounts)
+    attr_reader :total
+
+    # a hash with taxes totals by tax type
+    attr_reader :taxes_totals
+
+    # a hash with totals without taxes for any kind of sale
+    attr_reader :sale_totals
+
     INVOICE_TYPES = %w[01 03].freeze
 
     def operation
