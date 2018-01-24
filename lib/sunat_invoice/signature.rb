@@ -3,6 +3,7 @@
 require_relative 'model'
 require_relative 'utils'
 require 'xmldsig'
+require 'open-uri'
 
 module SunatInvoice
   class Signature < Model
@@ -90,12 +91,16 @@ module SunatInvoice
       Base64.encode64(certificate.to_der).gsub(/\n/, '')
     end
 
+    def file_content(file)
+      open(file) { |f| f.read }
+    end
+
     def private_key
-      OpenSSL::PKey::RSA.new(File.read(provider.pk_file))
+      OpenSSL::PKey::RSA.new(file_content(provider.pk_file))
     end
 
     def certificate
-      OpenSSL::X509::Certificate.new(File.read(provider.cert_file))
+      OpenSSL::X509::Certificate.new(file_content(provider.cert_file))
     end
   end
 end
