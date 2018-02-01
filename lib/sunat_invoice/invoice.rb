@@ -19,7 +19,6 @@ module SunatInvoice
       @document_number = opts[:document_number] || 'F001-1'
       @currency = opts[:currency] || 'PEN'
       @lines ||= []
-      @signature = SunatInvoice::Signature.new(provider: @provider)
     end
 
     def parties_default(opts)

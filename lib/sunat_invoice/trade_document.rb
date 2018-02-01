@@ -20,6 +20,11 @@ module SunatInvoice
 
     INVOICE_TYPES = %w[01 03].freeze
 
+    def initialize(*args)
+      super(*args)
+      @signature ||= SunatInvoice::Signature.new(provider: @provider)
+    end
+
     def operation
       :send_bill
     end
