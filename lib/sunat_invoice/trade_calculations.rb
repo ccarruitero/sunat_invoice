@@ -12,9 +12,8 @@ module SunatInvoice
 
     def calculate_total
       # calculate invoice total
-      @total = 0
-      @total += @taxes_totals.values.sum
-      @total += @sale_totals.reject { |k, _v| k == '1004' }.values.sum
+      sales_sum = @sale_totals.reject { |k, _v| k == '1004' }.values.sum
+      @total = (@taxes_totals.values.sum + sales_sum).round(2)
       @total -= discount if discount
     end
 
@@ -38,7 +37,8 @@ module SunatInvoice
       taxes = lines&.map(&:sale_taxes)&.flatten
       taxes&.each do |tax|
         @taxes_totals[tax.keys.first] ||= 0
-        @taxes_totals[tax.keys.first] += tax.values.sum
+        new_sum = (@taxes_totals[tax.keys.first] + tax.values.sum).round(2)
+        @taxes_totals[tax.keys.first] = new_sum
       end
     end
 
