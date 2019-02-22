@@ -26,7 +26,7 @@ module SunatInvoice
         total_code = get_total_code(item.taxes.first)
         if total_code
           @sale_totals[total_code] = 0 unless @sale_totals[total_code]
-          @sale_totals[total_code] += item.bi_value
+          @sale_totals[total_code] = (@sale_totals[total_code] + item.bi_value).round(2)
         end
       end
     end
