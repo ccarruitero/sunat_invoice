@@ -109,3 +109,14 @@ scope '#sale_taxes' do
     assert_equal @item.sale_taxes.values, [21.6, 10]
   end
 end
+
+scope 'allow price_included_tax parameter' do
+  item = SunatInvoice::Item.new(quantity: 1,
+                                price_included_tax: 100,
+                                price_code: '01',
+                                description: 'item description',
+                                unit_code: 'NIU')
+  item.taxes << SunatInvoice::Tax.new(amount: 15.25, tax_type: :igv)
+  assert_equal item.sale_price.to_s, 100.to_s
+  assert_equal item.bi_value.to_s, 84.75.to_s
+end

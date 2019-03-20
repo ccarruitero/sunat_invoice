@@ -4,7 +4,8 @@ require_relative 'line'
 
 module SunatInvoice
   class Item < Line
-    attr_accessor :quantity, :description, :price, :price_code, :unit_code
+    attr_accessor :quantity, :description, :price, :price_code, :unit_code,
+                  :price_included_tax
 
     def initialize(*args)
       # * quantity - quantity of item
@@ -15,6 +16,7 @@ module SunatInvoice
       #   UN/ECE rec 20- Unit Of Measure
       #   http://www.unece.org/fileadmin/DAM/cefact/recommendations/rec20/rec20_rev3_Annex2e.pdf
       # * taxes - An array of SunatInvoice::Tax
+      # * price_included_tax - price with taxes
       super(*args)
       @taxes ||= []
     end
@@ -38,8 +40,13 @@ module SunatInvoice
       end
     end
 
+    def set_price
+      @price ||= (@price_included_tax - sum_taxes).round(2) if @price_included_tax
+    end
+
     def bi_value
       # bi of sale = price without taxes * quantity
+      set_price
       (@price.to_f * @quantity.to_f).round(2)
     end
 
@@ -55,7 +62,7 @@ module SunatInvoice
 
     def sale_price
       # unit price with tax
-      (@price.to_f + sum_taxes).round(2)
+      @price_included_tax || (@price.to_f + sum_taxes).round(2)
     end
 
     private
