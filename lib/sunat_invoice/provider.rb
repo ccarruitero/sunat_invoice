@@ -7,7 +7,17 @@ module SunatInvoice
   class Provider < Tributer
     include Utils
 
-    attr_accessor :signature_id, :signature_location_id, :pk_file, :cert_file
+    # signature identification
+    attr_accessor :signature_id
+
+    # Id for signature element in xml document
+    attr_accessor :signature_location_id
+
+    # public key file path
+    attr_accessor :pk_file
+
+    # certificate file path
+    attr_accessor :cert_file
 
     def info(xml, with_address = true)
       xml['cac'].AccountingSupplierParty do

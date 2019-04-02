@@ -1,2 +1,44 @@
 # Sunat Invoice
 Ruby gem to use [SUNAT Electronic Billing](http://cpe.sunat.gob.pe/factura-desde-los-sistemas-del-contribuyente) from your app
+
+Allow to generate Electronic Billing Documents and send to [SUNAT](http://www.sunat.gob.pe).
+
+## Usage
+
+### generate document
+
+First you have to initialize a kind of document that you want, with your
+desired attributes.
+
+```
+document = SunatInvoice::Invoice.new(invoice_attributes)
+```
+
+```
+Note: Currently we support this kind of documents:
+
+- Invoice for document type `01` and `03`
+- CreditNote for document type `07`
+- DebitNote for document type `08`
+```
+
+### send document
+
+After that, you have to send the document to SUNAT in this way:
+
+for document type `01` and related documents
+
+```
+client = SunatInvoice::InvoiceClient.new
+client.dispatch(document)
+```
+
+and for document type `03` and related documents
+
+```
+client = SunatInvoice::DailySummary.new()
+client.dispatch(document)
+```
+
+
+### parse response
