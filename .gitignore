@@ -2,3 +2,4 @@ Gemfile.lock
 *.swp
 *.gem
 test/certs
+doc
