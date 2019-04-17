@@ -13,7 +13,8 @@ module SunatInvoice
     }.freeze
 
     ALLOWED_PARSERS = %w[invoice summary status].freeze
-    VALID_PROCESS = %w[0 99].freeze
+    VALID_PROCESS = %w[0].freeze
+    IN_PROCESS = %w[99].freeze
 
     def initialize(body, parser_type)
       # body: SOAP body as a Hash. Typically Savon Response body.
@@ -47,6 +48,8 @@ module SunatInvoice
       if VALID_PROCESS.include?(status_code)
         encrypted_zip = status_hash[:content]
         decrypt_zip(encrypted_zip)
+      elsif IN_PROCESS.include?(status_code)
+        @message = 'Your ticket is still in process'
       else
         @message = status_hash[:content]
       end
