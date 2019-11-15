@@ -33,12 +33,12 @@ client = SunatInvoice::InvoiceClient.new
 client.dispatch(document)
 ```
 
-and for document type `03` and related documents
+for document type `03` and related documents, you should send a daily summary
+instead each document
 
 ```
-client = SunatInvoice::DailySummary.new()
-client.dispatch(document)
+daily_document = SunatInvoice::DailySummary.new
+client.dispatch(daily_document)
 ```
-
 
 ### parse response
