@@ -26,7 +26,8 @@ module SunatInvoice
         total_code = get_total_code(item.taxes.first)
         if total_code
           @sale_totals[total_code] = 0 unless @sale_totals[total_code]
-          @sale_totals[total_code] = (@sale_totals[total_code] + item.bi_value).round(2)
+          @sale_totals[total_code] = (@sale_totals[total_code] + item.bi_value)
+                                     .round(2)
         end
       end
     end
@@ -44,6 +45,7 @@ module SunatInvoice
 
     def get_total_code(tax)
       return unless tax
+
       case tax.tax_type
       # TODO: :isc
       when :igv

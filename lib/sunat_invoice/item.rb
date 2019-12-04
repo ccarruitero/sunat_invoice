@@ -41,7 +41,9 @@ module SunatInvoice
     end
 
     def set_price
-      @price ||= (@price_included_tax - sum_taxes).round(2) if @price_included_tax
+      return unless @price_included_tax
+
+      @price ||= (@price_included_tax - sum_taxes).round(2)
     end
 
     def bi_value

@@ -20,6 +20,7 @@ module SunatInvoice
       # body: SOAP body as a Hash. Typically Savon Response body.
       # parser_type: kind of parser to use.
       raise InvalidResponseParser unless ALLOWED_PARSERS.include?(parser_type)
+
       send("parse_#{parser_type}", body)
     end
 

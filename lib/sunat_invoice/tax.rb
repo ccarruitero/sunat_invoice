@@ -61,6 +61,7 @@ module SunatInvoice
 
     def tax_exemption(xml)
       return unless tax_exemption_reason
+
       xml['cbc'].TaxExemptionReasonCode(tax_exemption_reason)
     end
   end
