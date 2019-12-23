@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |s|
   s.name = 'sunat_invoice'
-  s.version = '0.1.1'
+  s.version = '0.2.0'
   s.summary = 'Ruby gem to use SUNAT Electronic Billing from your app'
   s.description = 'Generate and send Electronic Invoices to SUNAT'
   s.authors = ['César Carruitero']
