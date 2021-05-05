@@ -21,5 +21,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'factory_bot', '~> 4.8'
   s.add_development_dependency 'ffaker', '~> 2.7'
   s.add_development_dependency 'pry', '~> 0.11'
-  s.add_development_dependency 'rubocop', '~> 0.51'
+  s.add_development_dependency 'rubocop', '~> 1.14'
 end
